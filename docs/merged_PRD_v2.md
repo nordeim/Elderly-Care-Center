@@ -1,8 +1,4 @@
-# Elderly Daycare Platform — Merged PRD & Execution Plan (v2 — PAD-aligned)
-
-> **Single source of truth:** this is the updated, drop-in replacement PRD + Execution Plan that merges the original PRD, the Execution Plan, and the PAD\_condensed architecture specifics. It imports PAD’s SLOs, Prometheus metrics & alerts, media pipeline details, deploy playbook, and operational runbooks — and it adds explicit compliance, security gating, retention harmonization, and PWA/offline resilience.
-
----
+# Elderly Daycare Platform — Project Requirements Document
 
 ## Table of contents
 
@@ -86,7 +82,7 @@ Design: stateless web nodes, externalized sessions, containerized services, ABR 
 
 ---
 
-## 6. Non-functional requirements (NFRs) & SLOs — PAD-aligned
+## 6. Non-functional requirements (NFRs) & SLOs 
 
 **Performance (RUM & API):**
 
@@ -178,7 +174,7 @@ Commit to WCAG 2.1 AA baseline (prefer 2.2 AA where practical). Include automate
 
 ---
 
-## 10. Observability: Prometheus metrics catalog, alerts & runbooks (from PAD)
+## 10. Observability: Prometheus metrics catalog, alerts & runbooks 
 
 **Prometheus metrics (recommended):**
 
@@ -364,6 +360,3 @@ ffmpeg -i input.mp4 -c:v libx264 -preset medium -b:v 4500k -maxrate 4830k -bufsi
 3. Check Redis memory & connection status.
 4. If DB is the cause, scale read replicas or apply indexing fix and deploy migration in maintenance window.
 
----
-
-*End of document.*
