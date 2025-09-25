@@ -19,5 +19,6 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('access-admin', fn (User $user) => $user->hasAnyRole(['admin', 'super_admin']));
         Gate::define('access-staff', fn (User $user) => $user->hasAnyRole(['staff', 'admin', 'super_admin']));
+        Gate::define('access-caregiver', fn (User $user) => $user->hasAnyRole(['caregiver', 'admin', 'super_admin']));
     }
 }

@@ -96,4 +96,9 @@ class User extends Authenticatable
     {
         return $query->where('is_active', true);
     }
+
+    public function caregiverProfile()
+    {
+        return $this->hasOne(CaregiverProfile::class);
+    }
 }
