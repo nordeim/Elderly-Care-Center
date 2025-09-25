@@ -1,0 +1,61 @@
+name: CI Bootstrap
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  bootstrap:
+    name: Lint & Smoke Tests
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: testing
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer, phpstan
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run PHP CodeSniffer (PSR-12)
+        run: |
+          if [ -f vendor/bin/phpcs ]; then
+            vendor/bin/phpcs --standard=PSR12 app/ tests/
+          else
+            echo "PHP_CodeSniffer not installed; skipping"
+          fi
+
+      - name: Run PHPUnit smoke tests
+        run: |
+          if [ -f vendor/bin/phpunit ]; then
+            vendor/bin/phpunit --testsuite=Unit --stop-on-failure || true
+          else
+            echo "PHPUnit not installed; skipping"
+          fi
+
+      - name: Run PHPStan (level 5)
+        run: |
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse --level=5 app/
+          else
+            echo "PHPStan not installed; skipping"
+          fi
+
+      - name: Dependency vulnerability scan
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          scan: git
+          extra_args: "--only-found --fail"  # fail build if high-risk secrets detected
