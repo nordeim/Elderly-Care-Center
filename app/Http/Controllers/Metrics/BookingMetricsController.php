@@ -4,27 +4,44 @@ namespace App\Http\Controllers\Metrics;
 
 use App\Http\Controllers\Controller;
 use App\Support\Metrics\BookingMetrics;
+use App\Support\Metrics\MediaMetrics;
 use Illuminate\Http\Response;
 
 class BookingMetricsController extends Controller
 {
-    public function __construct(private readonly BookingMetrics $metrics)
+    public function __construct(
+        private readonly BookingMetrics $bookingMetrics,
+        private readonly MediaMetrics $mediaMetrics
+    )
     {
     }
 
     public function __invoke(): Response
     {
-        $snapshot = $this->metrics->snapshot();
+        $bookingSnapshot = $this->bookingMetrics->snapshot();
+        $mediaSnapshot = $this->mediaMetrics->snapshot();
+
+        $lines = array_merge(
+            $this->formatBookingMetrics($bookingSnapshot),
+            $this->formatMediaMetrics($mediaSnapshot)
+        );
+
+        return response(implode("\n", $lines) . "\n", 200)
+            ->header('Content-Type', 'text/plain; version=0.0.4');
+    }
+
+    private function formatBookingMetrics(array $snapshot): array
+    {
         $statuses = config('booking.statuses', []);
 
         $lines = [
             '# HELP elderly_bookings_created_total Total number of booking requests created.',
             '# TYPE elderly_bookings_created_total counter',
             sprintf('elderly_bookings_created_total %d', $snapshot['bookings_created_total'] ?? 0),
+            '# HELP elderly_booking_status_total Total bookings currently recorded per status.',
+            '# TYPE elderly_booking_status_total gauge',
         ];
 
-        $lines[] = '# HELP elderly_booking_status_total Total bookings currently recorded per status.';
-        $lines[] = '# TYPE elderly_booking_status_total gauge';
         foreach ($statuses as $status) {
             $value = $snapshot["booking_status_total:{$status}"] ?? 0;
             $lines[] = sprintf('elderly_booking_status_total{status="%s"} %d', $status, $value);
@@ -32,6 +49,7 @@ class BookingMetricsController extends Controller
 
         $lines[] = '# HELP elderly_booking_status_transition_total Total booking status transitions.';
         $lines[] = '# TYPE elderly_booking_status_transition_total counter';
+
         foreach ($statuses as $from) {
             foreach ($statuses as $to) {
                 if ($from === $to) {
@@ -50,14 +68,43 @@ class BookingMetricsController extends Controller
 
         $lines[] = '# HELP elderly_reservation_sweeper_total Reservation sweeper job executions.';
         $lines[] = '# TYPE elderly_reservation_sweeper_total counter';
+
         foreach (['success', 'failure'] as $result) {
             $value = $snapshot["reservation_sweeper_total:{$result}"] ?? 0;
             $lines[] = sprintf('elderly_reservation_sweeper_total{result="%s"} %d', $result, $value);
         }
 
-        $body = implode("\n", $lines) . "\n";
+        return $lines;
+    }
 
-        return response($body, 200)
-            ->header('Content-Type', 'text/plain; version=0.0.4');
+    private function formatMediaMetrics(array $snapshot): array
+    {
+        $lines = [
+            '# HELP elderly_media_ingest_total Total number of media items queued for ingestion.',
+            '# TYPE elderly_media_ingest_total counter',
+            sprintf('elderly_media_ingest_total %d', $snapshot['media_ingest_total'] ?? 0),
+
+            '# HELP elderly_media_transcode_started_total Media transcode jobs started.',
+            '# TYPE elderly_media_transcode_started_total counter',
+            sprintf('elderly_media_transcode_started_total %d', $snapshot['media_transcode_started_total'] ?? 0),
+
+            '# HELP elderly_media_transcode_success_total Media transcode jobs completed successfully.',
+            '# TYPE elderly_media_transcode_success_total counter',
+            sprintf('elderly_media_transcode_success_total %d', $snapshot['media_transcode_success_total'] ?? 0),
+
+            '# HELP elderly_media_transcode_failure_total Media transcode jobs that failed.',
+            '# TYPE elderly_media_transcode_failure_total counter',
+            sprintf('elderly_media_transcode_failure_total %d', $snapshot['media_transcode_failure_total'] ?? 0),
+
+            '# HELP elderly_media_virus_scan_failure_total Media items that failed virus scanning.',
+            '# TYPE elderly_media_virus_scan_failure_total counter',
+            sprintf('elderly_media_virus_scan_failure_total %d', $snapshot['media_virus_scan_failure_total'] ?? 0),
+
+            '# HELP elderly_media_conversion_backlog Media items currently pending conversion.',
+            '# TYPE elderly_media_conversion_backlog gauge',
+            sprintf('elderly_media_conversion_backlog %d', $snapshot['media_conversion_backlog'] ?? 0),
+        ];
+
+        return $lines;
     }
 }
