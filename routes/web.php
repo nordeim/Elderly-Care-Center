@@ -33,6 +33,7 @@ Route::middleware('web')->group(function () {
         Route::get('/', [BookingInboxController::class, 'index'])->name('dashboard');
         Route::post('/bookings/{booking}/status', [BookingInboxController::class, 'updateStatus'])->name('bookings.status');
 
+        Route::resource('bookings', BookingInboxController::class)->only(['index']);
         Route::resource('services', ServiceController::class);
         Route::resource('staff', AdminStaffController::class)->except(['show']);
     });
