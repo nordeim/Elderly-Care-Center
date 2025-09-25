@@ -21,8 +21,8 @@
 | A | Program Inception & Governance | ✅ Completed | Governance docs, compliance mapping, CI bootstrap, secrets guidance in place (`docs/governance/roles-and-responsibilities.md`, `docs/compliance/data-map.md`, `.github/workflows/ci-bootstrap.yml`). |
 | B | Foundation Platform & Authentication | ✅ Completed (baseline) / ⚠️ Gaps | Authentication models, migrations, controllers done (`app/Models/User.php`, `app/Http/Controllers/Auth/LoginController.php`); Docker/observability configs exist (`docker/docker-compose.yml`). Outstanding: Grafana dashboards, Ops documentation, full CI test harness. |
 | C | Public Content & Booking MVP | ✅ Major functionality | Public pages, admin booking inbox, booking flow, migrations delivered (`resources/views/pages/*.blade.php`, `app/Actions/Bookings/CreateBookingAction.php`, `database/migrations/2025_02_01_*.php`). Accessibility assets added (`public/css/accessibility.css`, `docs/accessibility/manual-audit-template.md`). Pending: email templates, browser/E2E tests, performance validation, moderation session evidence. |
-| D | Media Pipeline & Trust Builders | 🚧 In Progress | Queue + sweeper scaffold, booking metrics, Prometheus job and docs (`app/Jobs/ReservationSweeperJob.php`, `app/Support/Metrics/BookingMetrics.php`, `ops/observability/prometheus/prometheus.yml`, `docs/observability/metrics.md`). Media ingestion services, storage config, and UI enhancements not started. |
-| E | Accounts, Notifications & Calendars | ⏳ Not Started | No caregiver dashboards, notification jobs, or audit logging yet. |
+| D | Media Pipeline & Trust Builders | ✅ Completed | Media ingestion/transcoding jobs, storage config, worker deployment, virus scanning, frontend virtual tour components, captions review, and metrics delivered (`app/Jobs/Media/*`, `config/media.php`, `resources/views/components/media/player.blade.php`, `docs/accessibility/media-captions-review.md`). |
+| E | Accounts, Notifications & Calendars | ✅ Completed | Caregiver dashboards, reminder jobs/notifications, calendar export service, audit logs, validation docs, and observability dashboards implemented (`app/Http/Controllers/Caregiver/DashboardController.php`, `app/Jobs/Notifications/SendReminderJob.php`, `app/Services/Calendar/ICalGenerator.php`, `database/migrations/2025_04_01_*`, `docs/runbooks/notification-failures.md`). |
 | F | Payments, Analytics & Scale | ⏳ Not Started | Stripe, analytics dashboards, CDN infra pending. |
 | G | Launch Hardening & Operations | ⏳ Not Started | Audits, runbooks, and go-live tooling not begun. |
 
@@ -44,63 +44,54 @@ Legend: ✅ Completed · 🚧 In Progress · ⚠️ Risks/Gaps · ⏳ Not Starte
   - Laravel app bootstrap incomplete; tests cannot execute.
 
 ### Phase C — Public Content & Booking MVP
-- **Completed:**
-  - Public discovery pages (`resources/views/pages/home.blade.php`, `services.blade.php`, `staff.blade.php`).
-  - Booking form + request validation (`resources/views/pages/book.blade.php`, `app/Http/Requests/BookingRequest.php`).
-  - Booking domain models/migrations (`app/Models/Booking*.php`, `database/migrations/2025_02_01_0*.php`).
-  - Admin booking inbox + service/staff CRUD (`app/Http/Controllers/Admin/*`, `resources/views/admin/bookings/index.blade.php`).
-  - Accessibility baseline assets and manual audit template.
-  - Seeders for facilities, services, staff, testimonials.
-- **Gaps:**
-  - Email notifications (`resources/views/emails/booking_confirmation.blade.php`) not yet created.
-  - Automated tests remain skipped placeholders (`tests/Feature/Bookings/CreateBookingTest.php`, `tests/Feature/Accessibility/SkipLinkTest.php`).
-  - No documented performance testing outcomes or moderated session logs.
-  - Consent flows and privacy notice links not wired into UI.
+- **Completed:** Public discovery pages, booking flow, admin booking inbox, service/staff CRUD, accessibility baseline assets, testimonial/staff seeders, and booking feature test coverage (`tests/Feature/Bookings/CreateBookingTest.php`).
+- **Outstanding:** Browser-based E2E tests and performance benchmarks remain deferred to Phase F; booking confirmation email templates to be refreshed alongside payments integration.
 
 ### Phase D — Media Pipeline & Trust Builders
-- **Completed/In Progress:** Reservation sweeper job, queue config, failed jobs migration, booking metrics service and controller, Prometheus scrape job, observability docs, PHPUnit config and test harness scaffolding, metrics unit test (`tests/Unit/Metrics/BookingMetricsTest.php`).
-- **Not Started:** Media ingestion/transcoding jobs, storage configuration, frontend media components, captioning guidelines, media tests.
-- **Risks:** Without media pipeline, Phase D remains in early scaffolding; dependent trust content still missing.
+- **Completed:** Media schema/migrations (`database/migrations/2025_03_01_010000_create_media_tables.php`), ingestion/transcoding jobs (`app/Jobs/Media/*`), transcoding service (`app/Services/Media/TranscodingService.php`), media worker deployment/runbooks, virus scanning scripts, frontend media components (virtual tour page and player), PHPUnit and feature tests, validation/UX documentation, metrics exposure, and accessibility review of captions/transcripts.
 
-### Phase E–G
-- No implementation yet. All deliverables, tests, and documentation remain outstanding per plan.
+### Phase E — Accounts, Notifications & Calendars
+- **Completed:** Caregiver profile migration and model, dashboard controller/view, notification jobs and configuration (`app/Jobs/Notifications/SendReminderJob.php`, `config/notifications.php`), calendar export service/controller/view, audit logs migration/model, Prometheus exposure for notification metrics, feature tests (`tests/Feature/Notifications/ReminderTest.php`, `tests/Feature/Calendar/ICalExportTest.php`), usability validation (`docs/validation/phase-e-account-usability.md`), notification failure runbook, and observability documentation.
+
+### Phase F–G
+- Work has not started. Deliverables will commence following Phase F kickoff.
 
 ---
 
 ## Continuous Tracks & Cross-Cutting Concerns
-- **Testing:** PHPUnit harness (`phpunit.xml`, `tests/TestCase.php`) added, but majority of feature tests are placeholders. Need Laravel bootstrap completion and real coverage.
-- **Accessibility:** Skip-link and focus styles implemented; automated Axe CI still pending; manual audit template ready.
-- **Observability:** Prometheus scraping extended; Grafana dashboards and alerting rules missing.
-- **Documentation:** Several new docs exist (`docs/observability/metrics.md`, `docs/validation/reports/phase-c-accessibility.md`), but runbooks for booking/admin ops not authored.
+- **Testing:** PHPUnit harness active with new coverage for media, notifications, calendar export, and virtual tour (`tests/Feature/Media/VirtualTourTest.php`). Browser/Axe CI automation scheduled for Phase F.
+- **Accessibility:** Manual audits and Phase D/E validation reports (`docs/accessibility/media-captions-review.md`, `docs/validation/phase-e-account-usability.md`) highlight follow-up items tracked in backlog.
+- **Observability:** Prometheus endpoint now surfaces booking, media, and notification metrics; notification runbook and documentation published (`docs/runbooks/notification-failures.md`, `docs/observability/notification-metrics.md`). Grafana dashboards/alert wiring to be handled in Phase F.
+- **Documentation:** Workstream docs refreshed throughout Phases D–E, including media worker operations, notification runbook, and usability reports.
 
 ---
 
 ## Key Risks & Mitigations
 
-- **Testing Coverage Gap:** Without executable tests, regressions may slip. *Mitigation:* Finish Laravel bootstrap, implement feature/unit tests across booking and admin flows, integrate into CI.
-- **Media Pipeline Schedule Risk:** Significant Phase D deliverables remain; plan resource allocation and milestones before proceeding to Phase E.
-- **Operational Readiness:** No runbooks for queue workers or booking inbox operations. *Mitigation:* Draft ops docs and verify on-call readiness before Phase D sign-off.
-- **Security & Compliance Evidence:** Consent handling and privacy link integrations pending; ensure alignment with `docs/compliance/privacy-assessment.md` before production.
+- **Payments & Analytics Readiness:** Phase F will introduce new integrations (Stripe, analytics dashboards). *Mitigation:* Engage payments vendor early, finalize analytics schema, and prototype Grafana dashboards ahead of Phase F.
+- **CI Automation Debt:** Browser-based E2E and accessibility automation still pending. *Mitigation:* Schedule Cypress/Axe integration in upcoming sprint with dedicated QA support.
+- **Security & Compliance Evidence:** Audit logs implemented; need to revisit consent/privacy UI elements during Phase F to align with `docs/compliance/privacy-assessment.md`.
+- **Operational Load:** Notification and media pipelines add queue pressure. *Mitigation:* Monitor new metrics, tune queue workers, and finalize incident drills prior to Phase G.
 
 ---
 
 ## Recommended Next Actions
 
-1. **Finalize Phase C Validation**
-   - **Owner:** QA Lead / Lead Developer
-   - Implement booking confirmation email, add accessibility + booking flow feature tests, run moderated sessions, and capture findings in `docs/validation/reports/phase-c-accessibility.md`.
+1. **Kick Off Phase F — Payments & Analytics**
+   - **Owner:** Product Owner / Payments Lead
+   - Confirm Stripe integration approach, outline analytics dashboards, and allocate infrastructure resources.
 
-2. **Advance Phase D Media Pipeline**
-   - **Owner:** Media Engineer / DevOps
-   - Scaffold media ingestion/transcoding services, configure storage and security controls, produce captioning guidelines, and add observability metrics.
+2. **Expand Automated Testing & CI**
+   - **Owner:** QA Lead
+   - Integrate browser-based tests and accessibility automation, ensure notification/calendar tests run in CI.
 
-3. **Strengthen Observability & Ops Runbooks**
+3. **Grafana & Alerting Rollout**
    - **Owner:** DevOps Engineer
-   - Create Grafana dashboards, alert definitions, and documentation for booking metrics and queue workers.
+   - Build dashboards for booking, media, and notification metrics; wire Prometheus alerts based on runbook thresholds.
 
-4. **Prepare for Phase E Entry**
-   - **Owner:** Product Owner / Lead Developer
-   - Define detailed scope, ensure notification providers and audit logging strategy ready before starting caregiver accounts.
+4. **Plan Phase G Hardening Activities**
+   - **Owner:** Security Lead / Operations Lead
+   - Draft incident response drills, finalize audit schedule, and prepare go-live checklist updates.
 
 ---
 

@@ -34,13 +34,6 @@ class ReminderTest extends TestCase
         Notification::fake();
     }
 
-    protected function tearDown(): void
-    {
-        app(NotificationMetrics::class)->snapshot();
-
-        parent::tearDown();
-    }
-
     public function test_send_reminder_marks_notification_sent(): void
     {
         [$user, $profile, $booking] = $this->createCaregiverBooking();

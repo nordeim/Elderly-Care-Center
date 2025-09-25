@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Metrics;
 use App\Http\Controllers\Controller;
 use App\Support\Metrics\BookingMetrics;
 use App\Support\Metrics\MediaMetrics;
+use App\Support\Metrics\NotificationMetrics;
 use Illuminate\Http\Response;
 
 class BookingMetricsController extends Controller
 {
     public function __construct(
         private readonly BookingMetrics $bookingMetrics,
-        private readonly MediaMetrics $mediaMetrics
+        private readonly MediaMetrics $mediaMetrics,
+        private readonly NotificationMetrics $notificationMetrics
     )
     {
     }
@@ -20,10 +22,12 @@ class BookingMetricsController extends Controller
     {
         $bookingSnapshot = $this->bookingMetrics->snapshot();
         $mediaSnapshot = $this->mediaMetrics->snapshot();
+        $notificationSnapshot = $this->notificationMetrics->snapshot();
 
         $lines = array_merge(
             $this->formatBookingMetrics($bookingSnapshot),
-            $this->formatMediaMetrics($mediaSnapshot)
+            $this->formatMediaMetrics($mediaSnapshot),
+            $this->formatNotificationMetrics($notificationSnapshot)
         );
 
         return response(implode("\n", $lines) . "\n", 200)
@@ -104,6 +108,52 @@ class BookingMetricsController extends Controller
             '# TYPE elderly_media_conversion_backlog gauge',
             sprintf('elderly_media_conversion_backlog %d', $snapshot['media_conversion_backlog'] ?? 0),
         ];
+
+        return $lines;
+    }
+
+    private function formatNotificationMetrics(array $snapshot): array
+    {
+        $lines = [
+            '# HELP elderly_notifications_scheduled_total Notifications scheduled for delivery.',
+            '# TYPE elderly_notifications_scheduled_total counter',
+            sprintf('elderly_notifications_scheduled_total %d', $snapshot['notifications_scheduled_total'] ?? 0),
+
+            '# HELP elderly_notifications_sent_total Notifications successfully delivered.',
+            '# TYPE elderly_notifications_sent_total counter',
+            sprintf('elderly_notifications_sent_total %d', $snapshot['notifications_sent_total'] ?? 0),
+
+            '# HELP elderly_notifications_failed_total Notifications that failed delivery.',
+            '# TYPE elderly_notifications_failed_total counter',
+            sprintf('elderly_notifications_failed_total %d', $snapshot['notifications_failed_total'] ?? 0),
+
+            '# HELP elderly_notifications_skipped_total Notifications skipped due to preferences or quiet hours.',
+            '# TYPE elderly_notifications_skipped_total counter',
+            sprintf('elderly_notifications_skipped_total %d', $snapshot['notifications_skipped_total'] ?? 0),
+        ];
+
+        foreach (['email', 'sms'] as $channel) {
+            $lines[] = sprintf(
+                'elderly_notifications_scheduled_total{channel="%s"} %d',
+                $channel,
+                $snapshot["notifications_scheduled_total:{$channel}"] ?? 0
+            );
+            $lines[] = sprintf(
+                'elderly_notifications_sent_total{channel="%s"} %d',
+                $channel,
+                $snapshot["notifications_sent_total:{$channel}"] ?? 0
+            );
+            $lines[] = sprintf(
+                'elderly_notifications_failed_total{channel="%s"} %d',
+                $channel,
+                $snapshot["notifications_failed_total:{$channel}"] ?? 0
+            );
+            $lines[] = sprintf(
+                'elderly_notifications_skipped_total{channel="%s"} %d',
+                $channel,
+                $snapshot["notifications_skipped_total:{$channel}"] ?? 0
+            );
+        }
 
         return $lines;
     }
