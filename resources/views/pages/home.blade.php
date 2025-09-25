@@ -14,7 +14,7 @@
                 @foreach ($services as $service)
                     <article class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-xl font-semibold">{{ $service->name }}</h3>
-                        <p class="mt-2 text-sm text-slate-600">{{ Str::limit($service->description, 140) }}</p>
+                        <p class="mt-2 text-sm text-slate-600">{{ \Illuminate\Support\Str::limit($service->description, 140) }}</p>
                         <p class="mt-4 font-medium">Duration: {{ $service->duration_minutes }} minutes</p>
                     </article>
                 @endforeach
