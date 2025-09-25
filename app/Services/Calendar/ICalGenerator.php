@@ -39,7 +39,8 @@ class ICalGenerator
         $start = optional($slot)->start_at ? Carbon::parse($slot->start_at)->setTimezone($timezone) : null;
         $end = optional($slot)->end_at ? Carbon::parse($slot->end_at)->setTimezone($timezone) : null;
 
-        $uid = $booking->uuid ?? sprintf('%s@elderlydaycare.local', Str::uuid());
+        $uidSource = $booking->uuid ?? (string) $booking->id;
+        $uid = sprintf('%s@elderlydaycare.local', $uidSource);
         $summary = $service?->name ?? 'Elderly Daycare Visit';
         $description = trim(sprintf(
             "%s\nStatus: %s",
