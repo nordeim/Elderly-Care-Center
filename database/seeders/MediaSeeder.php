@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\MediaItem;
 use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class MediaSeeder extends Seeder
