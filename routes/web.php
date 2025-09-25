@@ -9,6 +9,7 @@ use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\ServicesController;
 use App\Http\Controllers\Site\StaffController as SiteStaffController;
 use App\Http\Controllers\Site\TestimonialsController;
+use App\Http\Controllers\Site\VirtualTourController;
 use App\Http\Controllers\Metrics\BookingMetricsController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,7 @@ Route::middleware('web')->group(function () {
     Route::get('/services', ServicesController::class)->name('services.index');
     Route::get('/staff', SiteStaffController::class)->name('staff.index');
     Route::get('/testimonials', TestimonialsController::class)->name('testimonials.index');
+    Route::get('/virtual-tour', VirtualTourController::class)->name('virtual-tour.show');
     Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
     Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
 

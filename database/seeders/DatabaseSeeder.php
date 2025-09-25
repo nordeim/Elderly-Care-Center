@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             StaffSeeder::class,
             TestimonialSeeder::class,
+            MediaSeeder::class,
         ]);
     }
 }

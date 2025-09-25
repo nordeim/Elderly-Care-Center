@@ -25,11 +25,30 @@
             <h2 class="text-2xl font-semibold">Testimonials</h2>
             <div class="mt-6 space-y-6">
                 @foreach ($testimonials as $testimonial)
-                    <blockquote class="bg-white p-6 rounded-lg shadow">
-                        <p class="italic">“{{ $testimonial->content }}”</p>
-                        <footer class="mt-4 text-sm text-slate-500">— {{ optional($testimonial->client)->first_name ?? 'Family Caregiver' }}</footer>
-                    </blockquote>
+                    <article class="bg-white p-6 rounded-lg shadow space-y-4">
+                        @php
+                            $featured = $testimonial->featuredMedia();
+                        @endphp
+
+                        @if($featured)
+                            <x-media.player :sources="[
+                                ['url' => $featured->file_url, 'type' => $featured->mime_type],
+                            ]" :captions="$featured->captions_url" :poster="$featured->conversions['thumbnail']['url'] ?? null">
+                                Video testimonial from our community
+                            </x-media.player>
+                        @endif
+
+                        <blockquote>
+                            <p class="italic">“{{ $testimonial->content }}”</p>
+                            <footer class="mt-4 text-sm text-slate-500">— {{ optional($testimonial->client)->first_name ?? 'Family Caregiver' }}</footer>
+                        </blockquote>
+                    </article>
                 @endforeach
+            </div>
+            <div class="mt-8 text-center">
+                <a href="{{ route('virtual-tour.show') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-md">
+                    Explore Our Virtual Tour
+                </a>
             </div>
         </section>
     </div>

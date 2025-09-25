@@ -12,7 +12,12 @@ class HomeController extends Controller
     public function __invoke(): View
     {
         $services = Service::query()->limit(4)->get();
-        $testimonials = Testimonial::query()->where('status', 'approved')->latest()->limit(3)->get();
+        $testimonials = Testimonial::query()
+            ->with(['client', 'media'])
+            ->where('status', 'approved')
+            ->latest()
+            ->limit(3)
+            ->get();
 
         return view('pages.home', compact('services', 'testimonials'));
     }
