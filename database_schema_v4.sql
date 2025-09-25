@@ -1,3 +1,4 @@
+```sql
 -- MariaDB 11.8 — Elderly Daycare Platform Database Schema
 -- Engine: InnoDB, Charset: utf8mb4, Collation: utf8mb4_0900_ai_ci
 -- IDs: BIGINT AUTO_INCREMENT (internal) + CHAR(36) UUID (external)
@@ -936,3 +937,4 @@ CREATE TABLE failed_jobs (
 --   ON DELETE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
+```
