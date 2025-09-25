@@ -9,6 +9,7 @@ use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\ServicesController;
 use App\Http\Controllers\Site\StaffController as SiteStaffController;
 use App\Http\Controllers\Site\TestimonialsController;
+use App\Http\Controllers\Metrics\BookingMetricsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function () {

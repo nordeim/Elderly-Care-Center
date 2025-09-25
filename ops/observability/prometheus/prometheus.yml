@@ -18,3 +18,12 @@ scrape_configs:
           - app:8000
         labels:
           service: elderly-queue
+
+  - job_name: 'booking-metrics'
+    metrics_path: /metrics/booking
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - app:8000
+        labels:
+          service: elderly-booking
