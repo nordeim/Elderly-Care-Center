@@ -1,5 +1,5 @@
 -- =============================================
--- ELDERLY DAYCARE CENTER DATABASE SCHEMA
+-- ELDERLY DAYCARE CENTER DATABASE SCHEMA v1
 -- MariaDB Version: 11.8
 -- Character Set: utf8mb4 (emoji support)
 -- Collation: utf8mb4_unicode_ci
