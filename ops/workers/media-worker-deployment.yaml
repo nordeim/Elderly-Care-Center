@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-worker
+  labels:
+    app: elderly-daycare
+    component: media-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: elderly-daycare
+      component: media-worker
+  template:
+    metadata:
+      labels:
+        app: elderly-daycare
+        component: media-worker
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: media-worker
+          image: ghcr.io/nordeim/elderly-daycare-app:latest
+          imagePullPolicy: IfNotPresent
+          command: ["php", "artisan", "queue:work", "redis", "--queue=media", "--sleep=3", "--tries=3", "--max-time=3600"]
+          env:
+            - name: APP_ENV
+              value: production
+            - name: APP_DEBUG
+              value: "false"
+            - name: QUEUE_CONNECTION
+              value: redis
+            - name: MEDIA_DISK
+              valueFrom:
+                secretKeyRef:
+                  name: media-storage
+                  key: disk
+            - name: MEDIA_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: media-storage
+                  key: bucket
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: media-storage
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: media-storage
+                  key: secret_key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: media-storage
+                  key: region
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pgrep -f "queue:work" >/dev/null
+            initialDelaySeconds: 60
+            periodSeconds: 120
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pgrep -f "queue:work" >/dev/null
+            initialDelaySeconds: 20
+            periodSeconds: 60
+      nodeSelector:
+        worker-type: cpu
+      tolerations:
+        - key: dedicated
+          value: workers
+          effect: NoSchedule
