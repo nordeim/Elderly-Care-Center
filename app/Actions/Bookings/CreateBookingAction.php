@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\BookingSlot;
 use App\Models\BookingStatusHistory;
 use App\Models\Client;
+use App\Support\Metrics\BookingMetrics;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,7 +14,7 @@ use RuntimeException;
 
 class CreateBookingAction
 {
-    public function __construct(private readonly DatabaseManager $db)
+    public function __construct(private readonly DatabaseManager $db, private readonly BookingMetrics $metrics)
     {
     }
 
@@ -42,6 +43,8 @@ class CreateBookingAction
                     'caregiver_name' => $payload['caregiver_name'] ?? null,
                 ];
                 $booking->save();
+
+                $this->metrics->recordBookingCreated($booking->status);
 
                 return $booking;
             }
@@ -74,6 +77,8 @@ class CreateBookingAction
             ]);
 
             $slot->decrement('available_count');
+
+            $this->metrics->recordBookingCreated($booking->status);
 
             return $booking;
         });
