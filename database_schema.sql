@@ -1,5 +1,5 @@
 -- ============================================================================
--- ELDERLY DAYCARE CENTER DATABASE SCHEMA
+-- ELDERLY DAYCARE CENTER DATABASE SCHEMA v2
 -- Version: 2.0.0
 -- Database: MariaDB 11.8
 -- Character Set: utf8mb4 (full Unicode support including emojis)
