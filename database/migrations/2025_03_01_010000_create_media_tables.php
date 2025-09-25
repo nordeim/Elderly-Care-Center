@@ -19,12 +19,15 @@ return new class extends Migration {
             $table->json('conversions')->nullable();
             $table->string('captions_url', 1024)->nullable();
             $table->json('attributes')->nullable();
+            $table->enum('status', ['pending', 'processing', 'ready', 'failed'])->default('pending');
+            $table->text('error_message')->nullable();
             $table->foreignId('uploaded_by')->nullable()->constrained('users');
             $table->timestamp('uploaded_at')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
 
             $table->index(['owner_type', 'owner_id']);
+            $table->index('status');
         });
 
         Schema::create('media_associations', function (Blueprint $table) {
