@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             StaffSeeder::class,
             TestimonialSeeder::class,
             MediaSeeder::class,
+            CaregiverSeeder::class,
         ]);
     }
 }

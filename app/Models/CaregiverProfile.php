@@ -36,4 +36,8 @@ class CaregiverProfile extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function bookingNotifications()
+    {
+        return $this->hasMany(BookingNotification::class, 'caregiver_profile_id');
+    }
 }

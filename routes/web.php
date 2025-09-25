@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\BookingInboxController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Caregiver\DashboardController as CaregiverDashboardController;
+use App\Http\Controllers\Calendar\BookingExportController;
 use App\Http\Controllers\Site\BookingController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\ServicesController;
@@ -31,6 +33,12 @@ Route::middleware('web')->group(function () {
     Route::get('/virtual-tour', VirtualTourController::class)->name('virtual-tour.show');
     Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
     Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
+
+    Route::middleware(['auth', 'can:access-caregiver'])->prefix('caregiver')->as('caregiver.')->group(function () {
+        Route::get('/dashboard', [CaregiverDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/preferences', [CaregiverDashboardController::class, 'updatePreferences'])->name('preferences.update');
+        Route::get('/calendar/export', BookingExportController::class)->name('calendar.export');
+    });
 
     Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->as('admin.')->group(function () {
         Route::get('/', [BookingInboxController::class, 'index'])->name('dashboard');
