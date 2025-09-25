@@ -9,7 +9,6 @@ use App\Services\Calendar\ICalGenerator;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Response as ResponseFactory;
 use Illuminate\Support\Facades\URL;
 
 class BookingExportController extends Controller
@@ -19,8 +18,9 @@ class BookingExportController extends Controller
         Gate::authorize('access-caregiver');
 
         $profile = $this->resolveProfile($request->user());
-        $bookings = $profile->client
-            ? $profile->client->bookings()->with(['slot.service', 'slot.facility'])->get()
+        $client = $profile->client;
+        $bookings = $client
+            ? $client->bookings()->with(['slot.service', 'slot.facility'])->get()
             : collect();
 
         if ($request->boolean('download')) {
@@ -29,12 +29,12 @@ class BookingExportController extends Controller
             AuditLog::record(
                 'calendar_export.download',
                 $request->user(),
-                $profile->client,
+                $client,
                 ['booking_count' => $bookings->count()],
                 $request->ip()
             );
 
-            return ResponseFactory::make($ics, 200, [
+            return response($ics, 200, [
                 'Content-Type' => 'text/calendar; charset=utf-8',
                 'Content-Disposition' => 'attachment; filename="elderly-daycare-bookings.ics"',
             ]);
@@ -43,7 +43,7 @@ class BookingExportController extends Controller
         AuditLog::record(
             'calendar_export.view',
             $request->user(),
-            $profile->client,
+            $client,
             ['booking_count' => $bookings->count()],
             $request->ip()
         );

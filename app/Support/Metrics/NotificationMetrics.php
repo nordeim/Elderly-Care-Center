@@ -68,6 +68,11 @@ class NotificationMetrics
         $this->store->increment($this->namespaced($key), $amount);
     }
 
+    public function value(string $key): int
+    {
+        return (int) $this->store->get($this->namespaced($key), 0);
+    }
+
     private function namespaced(string $key): string
     {
         return sprintf('metrics:notifications:%s', $key);
