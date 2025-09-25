@@ -15,7 +15,11 @@ return new class extends Migration {
             $table->enum('status', ['pending', 'confirmed', 'attended', 'cancelled', 'no_show', 'archived'])->default('pending');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->enum('created_via', ['web', 'admin', 'phone', 'api'])->default('web');
-            $table->uuid('uuid')->default(DB::raw('(UUID())'));
+            $uuidColumn = $table->uuid('uuid');
+            if (Schema::getConnection()->getDriverName() === 'mysql') {
+                $uuidColumn->default(DB::raw('(UUID())'));
+            }
+            $uuidColumn->unique();
             $table->json('metadata')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
