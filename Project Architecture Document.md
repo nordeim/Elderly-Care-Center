@@ -1,7 +1,7 @@
 # 📐 PROJECT ARCHITECTURE DOCUMENT
 
 ## Elderly Daycare Center Web Platform
-### Technical Architecture Blueprint v1.0
+### Technical Architecture Blueprint v3.0
 
 ---
 
