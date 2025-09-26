@@ -20,7 +20,8 @@ RUN chmod +x /usr/bin/composer
 WORKDIR /var/www/html
 RUN addgroup --system --gid 1000 appgroup \
     && adduser  --system --uid 1000 --ingroup appgroup appuser \
-    && chown -R appuser:appgroup /var/www/html
+    && mkdir -p /home/appuser \
+    && chown -R appuser:appgroup /var/www/html /home/appuser
 
 # Entrypoint and healthcheck scripts (copy as root, then chmod)
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -29,12 +30,17 @@ RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
 
 # Switch to non-root: all Composer and app writes happen under appuser
 USER appuser
+ENV HOME=/home/appuser \
+    COMPOSER_HOME=/home/appuser/.composer
 
 # Copy manifests first (cache-friendly if only app code changes)
 COPY composer.json composer.lock ./
 
 # Copy application source (artisan included; vendor excluded via .dockerignore)
 COPY . .
+
+# Sanity check: artisan must exist before Composer runs scripts
+RUN test -f artisan || (echo "ERROR: artisan file missing in build context" && exit 1)
 
 # Install vendors with scripts enabled (artisan is present) and optimize autoload
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader

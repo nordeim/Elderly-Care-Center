@@ -1,16 +1,21 @@
-# General excludes (keep image lean)
+# VCS and meta
 .git
 .gitignore
-node_modules
+
+# Dependencies and build artifacts
 vendor
-tests
+node_modules
+
+# Laravel transient files
 storage/logs
 storage/framework/cache
 storage/framework/sessions
 storage/framework/views
+
+# Env/secrets (never bake into image)
 .env
 
-# Exclude docker folder by default, but whitelist required build assets
+# If you prefer to exclude docker assets generally, whitelist the ones needed for COPY:
 docker/*
 !docker/composer
 !docker/entrypoint.sh
