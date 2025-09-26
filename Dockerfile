@@ -36,8 +36,8 @@ USER appuser
 RUN composer dump-autoload --optimize --no-interaction
 
 # Entrypoint and healthcheck scripts
-COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY docker/php/app-healthcheck.sh /usr/local/bin/app-healthcheck.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/app-healthcheck.sh /usr/local/bin/app-healthcheck.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
 
 USER appuser
