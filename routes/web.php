@@ -14,6 +14,9 @@ use App\Http\Controllers\Site\TestimonialsController;
 use App\Http\Controllers\Site\VirtualTourController;
 use App\Http\Controllers\Metrics\BookingMetricsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HealthController;
+
+Route::get('/healthz', [HealthController::class, 'check']);
 
 Route::middleware('web')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
