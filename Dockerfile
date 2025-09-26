@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install system dependencies and PHP extensions
+# Install system dependencies and PHP extensions (as root)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git curl jq netcat-openbsd ca-certificates \
@@ -12,34 +12,34 @@ RUN apt-get update \
     && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy your static Composer binary into the container
+# Copy your static Composer binary and make it executable (as root)
 COPY docker/composer /usr/bin/composer
 RUN chmod +x /usr/bin/composer
 
-# Create app directory and set permissions
+# Workdir and non-root user (before Composer)
 WORKDIR /var/www/html
 RUN addgroup --system --gid 1000 appgroup \
-    && adduser --system --uid 1000 --ingroup appgroup appuser \
+    && adduser  --system --uid 1000 --ingroup appgroup appuser \
     && chown -R appuser:appgroup /var/www/html
 
-# Copy dependency manifests and install vendors
-COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader --prefer-dist --no-interaction
-
-# Copy application source (excluding vendor via .dockerignore)
-COPY . .
-
-# Switch to non-root user before running composer again
-USER appuser
-
-# Optimize autoload (artisan now exists)
-RUN composer dump-autoload --optimize --no-interaction
-
-# Entrypoint and healthcheck scripts
+# Entrypoint and healthcheck scripts (copy as root, then chmod)
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/app-healthcheck.sh /usr/local/bin/app-healthcheck.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
 
+# Switch to non-root: all Composer and app writes happen under appuser
 USER appuser
+
+# Copy manifests and install vendors inside the container (deterministic)
+COPY composer.json composer.lock ./
+RUN composer install --no-scripts --no-autoloader --prefer-dist --no-interaction
+
+# Copy application source (vendor/ excluded via .dockerignore)
+COPY . .
+
+# Optimize autoload (artisan now present)
+RUN composer dump-autoload --optimize --no-interaction
+
+# Final runtime
 CMD ["php-fpm"]
 
