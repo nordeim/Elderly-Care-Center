@@ -1,0 +1,163 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Booking Conversion Rate",
+      "datasource": "PrometheusMain",
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "targets": [
+        {
+          "expr": "elderly_bookings_confirmed_total / clamp_min(elderly_bookings_requested_total, 1) * 100",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Booking Funnel",
+      "datasource": "PrometheusMain",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(elderly_bookings_requested_total[1d]))",
+          "legendFormat": "Requested",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(increase(elderly_bookings_confirmed_total[1d]))",
+          "legendFormat": "Confirmed",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(increase(elderly_bookings_attended_total[1d]))",
+          "legendFormat": "Attended",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(increase(elderly_bookings_cancelled_total[1d]))",
+          "legendFormat": "Cancelled",
+          "refId": "D"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Payment Success vs Failures",
+      "datasource": "PrometheusMain",
+      "targets": [
+        {
+          "expr": "sum(increase(elderly_notifications_sent_total{channel=\"email\"}[1d]))",
+          "legendFormat": "Payments Succeeded",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(increase(elderly_notifications_failed_total{channel=\"email\"}[1d]))",
+          "legendFormat": "Payments Failed",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Notification Failure Rate",
+      "datasource": "PrometheusMain",
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "value",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "expr": "increase(elderly_notifications_failed_total[5m]) / clamp_min(increase(elderly_notifications_sent_total[5m]), 1) * 100",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": ["bookings", "payments", "notifications"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ]
+  },
+  "timezone": "utc",
+  "title": "Booking Funnel & Payments",
+  "uid": "elderly-booking-funnel",
+  "version": 1,
+  "weekStart": ""
+}
