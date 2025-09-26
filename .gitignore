@@ -1,0 +1,84 @@
+# =============================================================================
+# OS / Editor junk
+# =============================================================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# =============================================================================
+# Environment and secrets
+# =============================================================================
+.env
+.env.*
+!.env.example
+
+# =============================================================================
+# Dependencies
+# =============================================================================
+/vendor/
+/node_modules/
+
+# =============================================================================
+# Laravel cache / logs / debug
+# =============================================================================
+/bootstrap/cache/*.php
+/bootstrap/cache/*.json
+/storage/*.sqlite
+/storage/debugbar/*
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Keep public/storage symlink if present
+/public/storage
+
+# =============================================================================
+# Coverage / build artifacts
+# =============================================================================
+/coverage/
+/dist/
+/build/
+/.yarn/
+/.pnp.js
+/.nyc_output
+/.phpunit.result.cache
+/phpunit.xml
+
+# =============================================================================
+# Composer / Node lock files (commit these for determinism)
+# =============================================================================
+# DO NOT ignore composer.lock or package-lock.json
+# composer.lock
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
+
+# =============================================================================
+# Docker / Compose
+# =============================================================================
+/docker/*.env
+/docker/*.tmp
+/docker/*.bak
+# Allow committed Compose and Dockerfiles; ignore local overrides
+docker-compose.override.yml
+docker-compose.local.yml
+docker-compose.test.yml
+
+# =============================================================================
+# IDE / Project configs
+# =============================================================================
+.vscode/
+.idea/
+*.iml
+
+# =============================================================================
+# Terraform / Infra state (if present, keep out of VCS unless using remote state)
+# =============================================================================
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
