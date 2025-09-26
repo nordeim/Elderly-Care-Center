@@ -1,16 +1,16 @@
 # Codebase Completion Status Report
 
 **Project:** Elderly Daycare Platform  
-**Report Date:** 2025-09-25 (UTC+08)  
+**Report Date:** 2025-09-26 (UTC+08)  
 **Reference Plan:** `comprehensive_codebase_completion_execution_plan.md`
 
 ---
 
 ## Executive Summary
 
-- **Current Phase Alignment:** Phase C deliverables are largely implemented with foundational work from Phases A and B complete. Phase D has been initiated with reservation sweeper scaffolding and metrics exposure. Phases E–G remain unstarted.
-- **Confidence Level:** Moderate. Core booking flows, admin interfaces, and accessibility baselines exist, but automated tests are placeholders and Laravel bootstrap is unfinished, preventing end-to-end verification.
-- **Immediate Priorities:** Finalize Phase C validation (tests, seeds, accessibility audit), complete Phase D media pipeline prerequisites, and ensure operational runbooks and observability are production-ready.
+- **Current Phase Alignment:** Phases A–F are complete per `comprehensive_codebase_completion_execution_plan.md`. Phase G (launch hardening) is pending kickoff.
+- **Confidence Level:** High for functionality delivered through Phase F. Payments, analytics dashboards, CDN infrastructure, and observability/docs are in place with supporting feature tests.
+- **Immediate Priorities:** Initiate Phase G hardening: audits, runbooks, incident drills, and final compliance sign-offs.
 
 ---
 
@@ -23,8 +23,8 @@
 | C | Public Content & Booking MVP | ✅ Major functionality | Public pages, admin booking inbox, booking flow, migrations delivered (`resources/views/pages/*.blade.php`, `app/Actions/Bookings/CreateBookingAction.php`, `database/migrations/2025_02_01_*.php`). Accessibility assets added (`public/css/accessibility.css`, `docs/accessibility/manual-audit-template.md`). Pending: email templates, browser/E2E tests, performance validation, moderation session evidence. |
 | D | Media Pipeline & Trust Builders | ✅ Completed | Media ingestion/transcoding jobs, storage config, worker deployment, virus scanning, frontend virtual tour components, captions review, and metrics delivered (`app/Jobs/Media/*`, `config/media.php`, `resources/views/components/media/player.blade.php`, `docs/accessibility/media-captions-review.md`). |
 | E | Accounts, Notifications & Calendars | ✅ Completed | Caregiver dashboards, reminder jobs/notifications, calendar export service, audit logs, validation docs, and observability dashboards implemented (`app/Http/Controllers/Caregiver/DashboardController.php`, `app/Jobs/Notifications/SendReminderJob.php`, `app/Services/Calendar/ICalGenerator.php`, `database/migrations/2025_04_01_*`, `docs/runbooks/notification-failures.md`). |
-| F | Payments, Analytics & Scale | ⏳ Not Started | Stripe, analytics dashboards, CDN infra pending. |
-| G | Launch Hardening & Operations | ⏳ Not Started | Audits, runbooks, and go-live tooling not begun. |
+| F | Payments, Analytics & Scale | ✅ Completed | Stripe deposits, payment ledger, webhook processing, analytics dashboard, Grafana funnel, CDN Terraform module, load testing plan delivered (`app/Services/Payments/StripeService.php`, `resources/views/payments/deposit.blade.php`, `ops/observability/grafana-dashboards/booking-funnel.json`, `ops/terraform/modules/cdn/`, `docs/performance/load-testing-plan.md`). |
+| G | Launch Hardening & Operations | ⏳ Not Started | Audits, incident drills, go-live checklists pending. |
 
 Legend: ✅ Completed · 🚧 In Progress · ⚠️ Risks/Gaps · ⏳ Not Started
 
@@ -53,45 +53,48 @@ Legend: ✅ Completed · 🚧 In Progress · ⚠️ Risks/Gaps · ⏳ Not Starte
 ### Phase E — Accounts, Notifications & Calendars
 - **Completed:** Caregiver profile migration and model, dashboard controller/view, notification jobs and configuration (`app/Jobs/Notifications/SendReminderJob.php`, `config/notifications.php`), calendar export service/controller/view, audit logs migration/model, Prometheus exposure for notification metrics, feature tests (`tests/Feature/Notifications/ReminderTest.php`, `tests/Feature/Calendar/ICalExportTest.php`), usability validation (`docs/validation/phase-e-account-usability.md`), notification failure runbook, and observability documentation.
 
-### Phase F–G
-- Work has not started. Deliverables will commence following Phase F kickoff.
+### Phase F — Payments, Analytics & Scale
+- **Completed:** Payment ledger migration/model, Stripe service, checkout + webhook controllers, hosted deposit view, feature tests (`tests/Feature/Payments/StripeFlowTest.php`), Stripe integration documentation, admin analytics controller/view, Grafana dashboard, metrics definitions, CDN Terraform module and staging config, CDN deployment runbook, load testing plan, and automation script.
+
+### Phase G
+- Work not started. Deliverables will commence after launch hardening kickoff.
 
 ---
 
 ## Continuous Tracks & Cross-Cutting Concerns
-- **Testing:** PHPUnit harness active with new coverage for media, notifications, calendar export, and virtual tour (`tests/Feature/Media/VirtualTourTest.php`). Browser/Axe CI automation scheduled for Phase F.
-- **Accessibility:** Manual audits and Phase D/E validation reports (`docs/accessibility/media-captions-review.md`, `docs/validation/phase-e-account-usability.md`) highlight follow-up items tracked in backlog.
-- **Observability:** Prometheus endpoint now surfaces booking, media, and notification metrics; notification runbook and documentation published (`docs/runbooks/notification-failures.md`, `docs/observability/notification-metrics.md`). Grafana dashboards/alert wiring to be handled in Phase F.
-- **Documentation:** Workstream docs refreshed throughout Phases D–E, including media worker operations, notification runbook, and usability reports.
+- **Testing:** PHPUnit harness now covers media, notifications, calendar export, payments, and admin analytics (`tests/Feature/Admin/AnalyticsDashboardTest.php`). Browser/Axe CI remains planned for Phase G with Cypress integration.
+- **Accessibility:** Phase D/E audits documented; Phase F introduces payment UI accessible patterns. Outstanding tickets (e.g., ICS `aria-describedby`) scheduled for Phase G.
+- **Observability:** `/metrics/booking` exposes booking, media, and notification counters; Grafana dashboard added for booking/payout funnel. Payment success/failure metrics integrated into Prometheus.
+- **Documentation:** Payments, analytics, CDN, and load testing guides added. Runbooks now cover notification failures and CDN deployment.
 
 ---
 
 ## Key Risks & Mitigations
 
-- **Payments & Analytics Readiness:** Phase F will introduce new integrations (Stripe, analytics dashboards). *Mitigation:* Engage payments vendor early, finalize analytics schema, and prototype Grafana dashboards ahead of Phase F.
-- **CI Automation Debt:** Browser-based E2E and accessibility automation still pending. *Mitigation:* Schedule Cypress/Axe integration in upcoming sprint with dedicated QA support.
-- **Security & Compliance Evidence:** Audit logs implemented; need to revisit consent/privacy UI elements during Phase F to align with `docs/compliance/privacy-assessment.md`.
-- **Operational Load:** Notification and media pipelines add queue pressure. *Mitigation:* Monitor new metrics, tune queue workers, and finalize incident drills prior to Phase G.
+- **Launch Hardening Scope:** Phase G requires comprehensive audits (accessibility, penetration), runbooks, and incident drills. *Mitigation:* Allocate cross-functional team, schedule external assessments, and track exit criteria early.
+- **CI Automation Debt:** Browser/Axe testing not yet automated. *Mitigation:* Phase G backlog includes Cypress + Axe pipeline, with ownership assigned to QA lead.
+- **Compliance Evidence:** Payments integration must align with PCI SAQ A documentation. *Mitigation:* Update compliance artifacts and ensure Stripe configuration reviewed by security/compliance leads.
+- **Operational Load:** CDN + payments increase infrastructure components. *Mitigation:* Monitor new dashboards, run load tests per plan, and finalize escalation runbooks before launch.
 
 ---
 
 ## Recommended Next Actions
 
-1. **Kick Off Phase F — Payments & Analytics**
-   - **Owner:** Product Owner / Payments Lead
-   - Confirm Stripe integration approach, outline analytics dashboards, and allocate infrastructure resources.
+1. **Kick Off Phase G — Launch Hardening & Operations**
+   - **Owner:** Program Steering Committee
+   - Schedule accessibility audit, penetration test, incident drills, and finalize go-live checklist.
 
-2. **Expand Automated Testing & CI**
+2. **Automate Browser & Accessibility Testing**
    - **Owner:** QA Lead
-   - Integrate browser-based tests and accessibility automation, ensure notification/calendar tests run in CI.
+   - Implement Cypress + Axe CI pipeline covering booking, caregiver, payments flows, and record results in Phase G validation docs.
 
-3. **Grafana & Alerting Rollout**
-   - **Owner:** DevOps Engineer
-   - Build dashboards for booking, media, and notification metrics; wire Prometheus alerts based on runbook thresholds.
+3. **Finalize Compliance & Security Documentation**
+   - **Owner:** Security Lead
+   - Update PCI, privacy, and threat-model artifacts to reflect payments/CDN architecture.
 
-4. **Plan Phase G Hardening Activities**
-   - **Owner:** Security Lead / Operations Lead
-   - Draft incident response drills, finalize audit schedule, and prepare go-live checklist updates.
+4. **Operational Readiness Drills**
+   - **Owner:** Operations Lead
+   - Run failover drills, verify CDN rollback, queue recovery, and incident response runbooks; capture outcomes for Go-Live readiness review.
 
 ---
 
