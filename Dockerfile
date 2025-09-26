@@ -44,7 +44,10 @@ COPY composer.json composer.lock ./
 RUN test -f artisan || (echo "ERROR: artisan file missing in build context" && exit 1)
 
 # Install vendors with scripts enabled (artisan is present) and optimize autoload
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+# Install vendors and explicitly require predis/predis
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+    && composer require predis/predis --no-interaction --no-scripts --no-progress \
+    && composer dump-autoload --optimize --no-interaction
 
 # Final runtime
 CMD ["php-fpm"]
