@@ -31,6 +31,13 @@ Thumbs.db
 /storage/framework/sessions/*
 /storage/framework/testing/*
 /storage/framework/views/*
+/storage/logs/*
+!/storage/app/.gitignore
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore
 
 # Keep public/storage symlink if present
 /public/storage
