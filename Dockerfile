@@ -30,15 +30,14 @@ RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
 # Switch to non-root: all Composer and app writes happen under appuser
 USER appuser
 
-# Copy manifests and install vendors inside the container (deterministic)
+# Copy manifests first (cache-friendly if only app code changes)
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader --prefer-dist --no-interaction
 
-# Copy application source (vendor/ excluded via .dockerignore)
+# Copy application source (artisan included; vendor excluded via .dockerignore)
 COPY . .
 
-# Optimize autoload (artisan now present)
-RUN composer dump-autoload --optimize --no-interaction
+# Install vendors with scripts enabled (artisan is present) and optimize autoload
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 # Final runtime
 CMD ["php-fpm"]
