@@ -33,7 +33,7 @@ return new class extends Migration {
             $table->timestamp('scheduled_for')->nullable();
             $table->timestamps();
 
-            $table->unique(['booking_id', 'caregiver_profile_id', 'channel']);
+            $table->unique(['booking_id', 'caregiver_profile_id', 'channel'], 'booking_notify_unique');
             $table->index(['status', 'scheduled_for']);
             $table->index('channel');
         });
