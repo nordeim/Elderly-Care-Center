@@ -1,13 +1,18 @@
-# Ignore things we don’t want in the image
+# General excludes (keep image lean)
 .git
 .gitignore
 node_modules
 vendor
-docker
 tests
 storage/logs
 storage/framework/cache
 storage/framework/sessions
 storage/framework/views
 .env
+
+# Exclude docker folder by default, but whitelist required build assets
+docker/*
+!docker/composer
+!docker/entrypoint.sh
+!docker/app-healthcheck.sh
 
