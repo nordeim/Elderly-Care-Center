@@ -1,21 +1,21 @@
-# VCS and meta
+# VCS
 .git
 .gitignore
 
-# Dependencies and build artifacts
-vendor
-node_modules
+# Dependencies
+/vendor
+/node_modules
 
-# Laravel transient files
-storage/logs
-storage/framework/cache
-storage/framework/sessions
-storage/framework/views
+# Laravel runtime files
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
 
-# Env/secrets (never bake into image)
+# Secrets
 .env
 
-# If you prefer to exclude docker assets generally, whitelist the ones needed for COPY:
+# Docker build assets: exclude all, then re-include needed
 docker/*
 !docker/composer
 !docker/entrypoint.sh
