@@ -39,7 +39,7 @@ services:
       start_period: 30s
 
   mysql:
-    image: mariadb:11.8-noble
+    image: mariadb:10.11
     container_name: elderly-mysql
     restart: unless-stopped
     env_file:
