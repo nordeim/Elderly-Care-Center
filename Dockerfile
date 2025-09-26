@@ -23,6 +23,10 @@ RUN addgroup --system --gid 1000 appgroup \
     && mkdir -p /home/appuser \
     && chown -R appuser:appgroup /var/www/html /home/appuser
 
+# Copy application source (artisan included; vendor excluded via .dockerignore)
+COPY . .
+RUN chown -R appuser:appgroup /var/www/html
+
 # Entrypoint and healthcheck scripts (copy as root, then chmod)
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/app-healthcheck.sh /usr/local/bin/app-healthcheck.sh
@@ -35,9 +39,6 @@ ENV HOME=/home/appuser \
 
 # Copy manifests first (cache-friendly if only app code changes)
 COPY composer.json composer.lock ./
-
-# Copy application source (artisan included; vendor excluded via .dockerignore)
-COPY . .
 
 # Sanity check: artisan must exist before Composer runs scripts
 RUN test -f artisan || (echo "ERROR: artisan file missing in build context" && exit 1)
