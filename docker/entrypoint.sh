@@ -39,10 +39,19 @@ wait_for_port "${DB_HOST}" "${DB_PORT}" "mysql"
 wait_for_port "${REDIS_HOST}" "${REDIS_PORT}" "redis"
 
 # --- 3) Laravel bootstrap ---
-# Generate APP_KEY if missing (in .env)
+# Generate APP_KEY if missing (in .env) or left as placeholder
 if ! grep -qE '^APP_KEY=.+$' .env; then
   log "Generating APP_KEY"
   php artisan key:generate --force
+else
+  current_key=$(sed -n 's/^APP_KEY=//p' .env | head -n1)
+  current_key=${current_key%$'\r'}
+  current_key=${current_key%"}
+  current_key=${current_key#"}
+  if [[ -z "$current_key" || "$current_key" == *CHANGE_ME* ]]; then
+    log "APP_KEY placeholder detected; generating new key"
+    php artisan key:generate --force
+  fi
 fi
 
 # Storage symlink and directories
