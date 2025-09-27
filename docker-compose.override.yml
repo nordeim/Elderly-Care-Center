@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  app:
+    volumes:
+      - ./:/var/www/html:cached
+      - app-storage:/var/www/html/storage
+      - app-public:/var/www/html/public
+    command: ["bash", "-lc", "php artisan serve --host=0.0.0.0 --port=8000"]
+
