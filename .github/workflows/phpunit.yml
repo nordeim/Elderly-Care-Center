@@ -1,0 +1,46 @@
+name: Run PHPUnit Feature Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, pdo_sqlite, redis
+
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y libzip-dev zip unzip
+
+      - name: Get composer cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist
+
+      - name: Prepare environment
+        run: cp .env.example .env || true
+
+      - name: Generate APP_KEY
+        run: php artisan key:generate --force
+
+      - name: Run migrations (sqlite in-memory)
+        run: php artisan migrate --database=sqlite --force
+
+      - name: Run PHPUnit
+        run: php artisan test --coverage --testsuite=Feature

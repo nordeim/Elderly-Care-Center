@@ -1,0 +1,85 @@
+{
+  "project": "elderly-daycare-platform",
+  "date": "2025-09-28T00:00:00Z",
+  "checks": [
+    {
+      "id": "docker_compose_exists",
+      "description": "docker-compose.yml exists at repo root",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/docker-compose.yml"]
+    },
+    {
+      "id": "dockerfile_exists",
+      "description": "Dockerfile exists and uses php:8.2-fpm base image",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/Dockerfile","FROM php:8.2-fpm"]
+    },
+    {
+      "id": "entrypoint_script",
+      "description": "Entrypoint script exists and performs environment checks, migration runs and readiness marker",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/docker/entrypoint.sh","wait_for_port(...); php artisan migrate; date -Iseconds > /tmp/app.ready"]
+    },
+    {
+      "id": "app_healthcheck",
+      "description": "App healthcheck script exists and probes /healthz or readiness marker",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/docker/app-healthcheck.sh","test -f /tmp/app.ready","HEALTHCHECK_URL=/healthz"]
+    },
+    {
+      "id": "compose_healthcheck_configured",
+      "description": "docker-compose config defines healthcheck for app service",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/docker-compose.yml","healthcheck: test: [\"CMD-SHELL\", \"/usr/local/bin/app-healthcheck.sh\"]"]
+    },
+    {
+      "id": "booking_controller",
+      "description": "Booking controller present with create and store actions",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/app/Http/Controllers/Site/BookingController.php","create() and store() methods present, calls CreateBookingAction"]
+    },
+    {
+      "id": "create_booking_action",
+      "description": "CreateBookingAction exists and implements transactional booking creation with DB locking and stored procedure fallback",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/app/Actions/Bookings/CreateBookingAction.php","uses DB transaction, lockForUpdate, stored procedure branch for MySQL"]
+    },
+    {
+      "id": "bookings_migration",
+      "description": "Bookings migration exists and defines uniqueness and uuid columns",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/database/migrations/2025_02_01_040000_create_bookings_table.php","unique(['slot_id','client_id']) etc."]
+    },
+    {
+      "id": "booking_feature_test",
+      "description": "Booking feature test file exists",
+      "status": "WARN",
+      "reason": "Test present but is a placeholder skipped test",
+      "evidence": ["/Home1/project/elderly-daycare-platform/tests/Feature/Bookings/CreateBookingTest.php","markTestSkipped('Feature booking test will run once Laravel testing harness configured.')"]
+    },
+    {
+      "id": "media_ingest_job",
+      "description": "Media ingestion job exists and dispatches transcode jobs",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/app/Jobs/Media/IngestMediaJob.php","TranscodeJob::dispatch($media->id)->onQueue('media')"]
+    },
+    {
+      "id": "stripe_service",
+      "description": "StripeService exists for payment intents and syncing",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/app/Services/Payments/StripeService.php","createDepositIntent, retrieveIntent, syncFromIntent methods present"]
+    },
+    {
+      "id": "queue_config",
+      "description": "Queue configuration includes redis connection and default behavior",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/config/queue.php","'default' => env('QUEUE_CONNECTION','sync'), 'connections' => ['redis' => [...]]"]
+    },
+    {
+      "id": "filesystems_config",
+      "description": "Filesystems config defines s3 and media disk with env-driven driver",
+      "status": "PASS",
+      "evidence": ["/Home1/project/elderly-daycare-platform/config/filesystems.php","'s3' disk, 'media' disk uses MEDIA_STORAGE_DRIVER env"]
+    }
+  ]
+}
