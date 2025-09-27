@@ -164,6 +164,139 @@ https://copilot.microsoft.com/shares/JFhzvUiteKquEMWyrqvFt
 
 ---
 
+That’s a very clean build log, Jeremiah. Let’s walk through what it tells us and validate that your production‑ready Dockerfile is behaving exactly as intended:
+
+---
+
+## ✅ Build log analysis
+
+- **Base image**: `php:8.2-fpm` pulled and cached correctly.
+- **System deps & PHP extensions**: Step `[2/15]` took ~221s, which is expected for compiling gd/mbstring/zip/opcache with all dev headers. No missing library errors this time (oniguruma issue resolved).
+- **Opcache config**: Step `[3/15]` wrote your tuned `opcache-recommended.ini`.
+- **Composer binary**: Copied and validated (`composer --version` ran).
+- **User creation**: `appuser:appgroup` created with UID/GID 1000, home directory set.
+- **Entrypoint & healthcheck**: Copied and chmod’d to 0755.
+- **Cache‑friendly vendor install**:
+  - Step `[11/15]`: Only `composer.json` and `composer.lock` copied.
+  - Step `[12/15]`: `composer install --no-scripts` ran successfully as `appuser`. No artisan errors because scripts were skipped.
+- **App code copy**: Step `[13/15]` copied the rest of the source.
+- **Post‑autoload scripts**: Step `[14/15]` ran `composer run-script post-autoload-dump` and `composer dump-autoload --optimize`. Completed in ~5s, confirming artisan was present.
+- **Permissions normalization**: Step `[15/15]` took ~270s. That’s long, but expected if you have many files. It applied deterministic `775` for dirs, `664` for files, and ensured scripts are `755`.
+- **Export**: Final image tagged as `elderly-daycare-platform_app`.
+
+---
+
+## ⚠️ Observations
+
+1. **Long permission fix step**  
+   - The `find ... chmod` layer is expensive (~270s). This is because it touches every file in the app tree.  
+   - **Optimization**: Use `COPY --chown=appuser:appgroup` consistently for all copies, then you can drop the recursive `chown` and only run the `find` chmod normalization. That will cut build time significantly.
+
+2. **Composer cache warning**  
+   - Earlier you saw “Cannot create cache directory /nonexistent/.composer/cache”. That’s fixed now because you set `HOME` and `COMPOSER_HOME` before running Composer as `appuser`.
+
+3. **Opcache**  
+   - Config is in place. You may want to tune memory consumption (`128M`) depending on workload, but defaults are solid for production.
+
+4. **Image size**  
+   - With build‑essential and dev headers installed, the image is heavier. For production, you could use a multi‑stage build: compile extensions in a builder stage, then copy only the PHP runtime + extensions into a slim final stage. That would reduce size and attack surface.
+
+---
+
+## ✅ Validation against goals
+
+- **Cache‑friendly**: Yes, vendor layer only invalidates on manifest changes.  
+- **No artisan errors**: Confirmed, because scripts deferred until after app copy.  
+- **Non‑root runtime**: Entrypoint and CMD run as `appuser`.  
+- **Deterministic permissions**: Achieved, though costly in build time.  
+- **Production‑ready**: Opcache enabled, Redis extension installed, gd built with JPEG/Freetype, mbstring with oniguruma.  
+
+---
+
+## 📌 Next steps
+
+- **Performance optimization**: Replace the heavy `chown -R` with `COPY --chown` everywhere, and only run `find` chmod for mode normalization.  
+- **Image slimming**: Consider a multi‑stage build to drop build‑essential and dev headers from the final image.  
+- **Runtime serving**: For production, you’ll likely want Nginx + FPM instead of `artisan serve`. Your current setup is fine for dev/test, but not ideal for high‑traffic production.  
+
+---
+
+Would you like me to draft a **multi‑stage production Dockerfile** that strips out build toolchains and dev headers, leaving you with a lean runtime image? That would cut size and build time dramatically while keeping all your current operational guardrails.
+
+https://copilot.microsoft.com/shares/qNz13YrPM1mfSxGxy3Hy9
+
+---
+
+This log is exactly what you want to see from a hardened Laravel container startup, Jeremiah. Let’s break it down:
+
+---
+
+## ✅ What’s working
+
+- **.env handling**  
+  The entrypoint detected no `.env` and safely copied `.env.example`. That’s your fallback logic doing its job.
+
+- **Dependency waits**  
+  It patiently retried MySQL until the container was actually listening, then moved on to Redis. This prevents race conditions where migrations would fail because the DB wasn’t ready.
+
+- **Laravel bootstrap**  
+  - Storage symlink created (`public/storage` → `storage/app/public`).  
+  - Storage directories ensured.  
+  - Permissions normalized.  
+  - Cache strategy respected: since `APP_ENV` isn’t production, it cleared caches instead of building them.
+
+- **Database connectivity & migrations**  
+  - PDO check succeeded.  
+  - Migrations ran cleanly, creating all your tables in sequence.  
+  - The log shows each migration file executed with timing, confirming idempotent startup.
+
+- **Redis check**  
+  Ping returned `1`, confirming connectivity.
+
+- **Readiness marker & healthchecks**  
+  After startup validation, `/tmp/app.ready` was written. Your healthcheck script is probing `/healthz` every 15s, and the logs show consistent ~0.17–0.19ms responses. That’s a healthy loop.
+
+- **Application serving**  
+  Laravel’s built‑in server is running on `0.0.0.0:8000`, and responding to `/healthz`.
+
+---
+
+## ⚠️ Observations
+
+- **Startup delay**: It took ~14 attempts (~28s) before MySQL was ready. That’s normal for a fresh MariaDB container initializing, but you might want to increase the healthcheck `start_period` for MySQL to avoid false negatives on first boot.
+
+- **Non‑production mode**: The entrypoint correctly detected a non‑production environment and cleared caches. In production, it would build caches instead. That’s exactly the adaptive behavior you designed.
+
+- **Serving model**: Right now you’re using `artisan serve`. That’s fine for dev/test, but for production you’ll want to switch to `php-fpm` behind Nginx. Your Dockerfile is already prepared for that (`CMD ["php-fpm"]`), so it’s just a matter of adjusting your Compose stack.
+
+---
+
+## 🎯 Next refinements
+
+1. **Tune MySQL healthcheck**  
+   - Increase `start_period` to 60–90s in `docker-compose.yml` for MySQL.  
+   - This avoids the app container waiting so long with repeated retries.
+
+2. **Production stack**  
+   - Add an Nginx service in Compose, mount `public/` as docroot, and proxy to the FPM socket.  
+   - Switch the app container’s command back to `php-fpm`.  
+   - Healthcheck Nginx instead of artisan serve.
+
+3. **Permissions optimization**  
+   - Since you already use `COPY --chown`, you can drop the recursive `chown` in your Dockerfile and just run the `find … chmod` normalization. That will shave minutes off build time.
+
+---
+
+## ✅ Bottom line
+
+Your container is **bootstrapping correctly, running migrations, validating dependencies, and serving health endpoints**. The logs show a clean, deterministic startup sequence with no silent failures. You’ve essentially built a production‑grade Laravel container with explicit validation gates.
+
+Would you like me to sketch the **Nginx + FPM production Compose stack** next, so you can see how to evolve this from a dev‑friendly `artisan serve` setup into a true production topology?
+
+https://copilot.microsoft.com/shares/DwePTYhEPAdkgTarUE2R1
+
+---
+
 # Build failure diagnosis and fix
 
 Your build is failing while compiling the mbstring extension due to missing Oniguruma development headers. The log shows PHP’s configure step for mbstring requiring oniguruma via pkg-config and aborting when it’s not found. This is because we removed `libonig-dev` earlier; on Debian-based images like `php:8.2-fpm`, mbstring still depends on system oniguruma.

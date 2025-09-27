@@ -1,0 +1,112 @@
+version: "3.8"
+
+services:
+  app:
+    image: elderly-daycare-platform-app
+    container_name: elderly-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Non-secret defaults; override via .env
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-http://localhost}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-elderly_daycare}
+      DB_USERNAME: ${DB_USERNAME:-elderly}
+      DB_PASSWORD: ${DB_PASSWORD:-elderly_secret}
+    volumes:
+      - app-storage:/var/www/html/storage
+    expose:
+      - "9000"
+    depends_on:
+      - mysql
+      - redis
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    command: ["php-fpm"]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/app.ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: elderly-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      # Read-only mount of Nginx config and static assets
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Optional: custom mime/types or extra conf.d snippets
+      # - ./docker/mime.types:/etc/nginx/mime.types:ro
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  mysql:
+    image: mariadb:10.11
+    container_name: elderly-mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root_password}
+      MARIADB_DATABASE: ${DB_DATABASE:-elderly_daycare}
+      MARIADB_USER: ${DB_USERNAME:-elderly}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-elderly_secret}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u${MARIADB_USER:-elderly} -p${MARIADB_PASSWORD:-elderly_secret} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  redis:
+    image: redis:7.4
+    container_name: elderly-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+# Optional: Mailhog (commented out for production)
+#  mailhog:
+#    image: mailhog/mailhog:v1.0.1
+#    container_name: elderly-mailhog
+#    restart: unless-stopped
+#    ports:
+#      - "8025:8025" # Web UI
+#      - "1025:1025" # SMTP
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8025 || exit 1"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 12
+#      start_period: 30s
+
+volumes:
+  mysql-data:
+  app-storage:
+
