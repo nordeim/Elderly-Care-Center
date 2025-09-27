@@ -44,10 +44,7 @@ if ! grep -qE '^APP_KEY=.+$' .env; then
   log "Generating APP_KEY"
   php artisan key:generate --force
 else
-  current_key=$(sed -n 's/^APP_KEY=//p' .env | head -n1)
-  current_key=${current_key%$'\r'}
-  current_key=${current_key%"}
-  current_key=${current_key#"}
+  current_key=$(sed -n 's/^APP_KEY=//p' .env | head -n1 | tr -d '\r"')
   if [[ -z "$current_key" || "$current_key" == *CHANGE_ME* ]]; then
     log "APP_KEY placeholder detected; generating new key"
     php artisan key:generate --force
