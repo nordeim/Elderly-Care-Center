@@ -89,3 +89,76 @@ This way, Laravel logs the error but the container doesn’t exit. You can still
 👉 So: shorten the index name to ≤ 64 characters, rebuild, and your app container will stabilize. Want me to help you refactor all long index names across your migrations to future-proof this?
 
 https://copilot.microsoft.com/shares/N7SvfbZuwRMAMYMVHgQNv
+
+---
+
+Absolutely, Jeremiah — we can bake the `predis/predis` installation directly into the Dockerfile to ensure it's always present in the final image, even on fresh builds or CI pipelines. Here's how to do it cleanly and safely:
+
+---
+
+### 🔧 Updated Dockerfile snippet
+
+Replace this block:
+
+```dockerfile
+# Install vendors with scripts enabled (artisan is present) and optimize autoload
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+```
+
+with this:
+
+```dockerfile
+# Install vendors and explicitly require predis/predis
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+    && composer require predis/predis --no-interaction --no-scripts --no-progress \
+    && composer dump-autoload --optimize --no-interaction
+```
+
+---
+
+### 🧠 Why this works
+
+- `composer install` installs all locked dependencies.
+- `composer require predis/predis` ensures the package is added even if it’s not yet in `composer.json`.
+- `--no-scripts` avoids triggering Laravel’s post-install hooks prematurely (since artisan is already present).
+- `composer dump-autoload` ensures autoload files are rebuilt after adding Predis.
+
+---
+
+### 🛡️ Optional: lock version explicitly
+
+If you want to pin the version (e.g. `^3.2`), you can do:
+
+```dockerfile
+RUN composer require predis/predis:^3.2 --no-interaction --no-scripts --no-progress
+```
+
+Or add it manually to `composer.json` and rely on `composer install` alone.
+
+---
+
+### 🧼 Final polish
+
+If you’ve already committed `predis/predis` to `composer.json` and `composer.lock`, you don’t need `composer require` in the Dockerfile. Instead, just ensure `composer install` runs after copying those files:
+
+```dockerfile
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+```
+
+This is cleaner and avoids modifying the lock file during build.
+
+---
+
+### ✅ Recommendation
+
+Since you’ve already run `composer require predis/predis` manually and updated your lock file, the best practice now is:
+
+- **Commit** the updated `composer.json` and `composer.lock`.
+- **Keep** the Dockerfile as-is, with just `composer install`.
+
+That way, your image builds are deterministic and don’t mutate dependencies during build.
+
+---
+
+https://copilot.microsoft.com/shares/Synem7hAifUm1mbEg2dvW
