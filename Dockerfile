@@ -25,12 +25,14 @@ RUN addgroup --system --gid 1000 appgroup \
 
 # Copy application source (artisan included; vendor excluded via .dockerignore)
 COPY . .
-RUN chown -R appuser:appgroup /var/www/html
 
 # Entrypoint and healthcheck scripts (copy as root, then chmod)
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/app-healthcheck.sh /usr/local/bin/app-healthcheck.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
+RUN chown -R appuser:appgroup /var/www/html /home/appuser
+RUN chmod -R a+r /var/www/html /home/appuser
+RUN chmod 775 /var/www/html /home/appuser 
 
 # Switch to non-root: all Composer and app writes happen under appuser
 USER appuser
@@ -45,9 +47,10 @@ RUN test -f artisan || (echo "ERROR: artisan file missing in build context" && e
 
 # Install vendors with scripts enabled (artisan is present) and optimize autoload
 # Install vendors and explicitly require predis/predis
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
-    && composer require predis/predis --no-interaction --no-scripts --no-progress \
-    && composer dump-autoload --optimize --no-interaction
+#RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+#    && composer require predis/predis --no-interaction --no-scripts --no-progress \
+#    && composer dump-autoload --optimize --no-interaction
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 # Final runtime
 CMD ["php-fpm"]

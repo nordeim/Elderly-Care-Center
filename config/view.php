@@ -5,11 +5,5 @@ return [
         resource_path('views'),
     ],
 
-    'compiled' => env('VIEW_COMPILED_PATH', realpath(storage_path('framework/views'))),
-
-    'engine_resolver' => [
-        'blade' => [
-            'cache' => true,
-        ],
-    ],
+    'compiled' => env('VIEW_COMPILED_PATH', storage_path('framework/views')),
 ];

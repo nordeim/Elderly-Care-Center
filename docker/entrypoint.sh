@@ -38,6 +38,13 @@ fi
 
 # Ensure storage symlink and directories
 log "Ensuring storage symlink"; php artisan storage:link || true
+log "Ensuring storage directories"; mkdir -p \
+  storage/app/public \
+  storage/framework/cache/data \
+  storage/framework/sessions \
+  storage/framework/views \
+  storage/framework/testing \
+  storage/logs
 log "Cache warm-up (config/routes/views)"
 php artisan config:clear && php artisan config:cache
 php artisan route:clear && php artisan route:cache || true
