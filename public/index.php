@@ -1,16 +1,17 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
+
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
 
 require __DIR__.'/../vendor/autoload.php';
 
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
-
-$app->handleRequest(
-    request: $app->make(Illuminate\Http\Request::class)
-)->send();
-
-$app->terminate();
+$app->handleRequest(Request::capture());
