@@ -13,14 +13,14 @@ for v in "${required_vars[@]}"; do
   fi
 done
 
-# Ensure .env presence with strict fallback (fixes invalid Bash else block)
+# Ensure .env presence with strict fallback
 if [ ! -f ".env" ]; then
   if [ -f ".env.example" ]; then
     log "No .env found; copying .env.example -> .env"
     cp .env.example .env
-  else
+  } else {
     die "Neither .env nor .env.example found in working directory"
-  fi
+  }
 fi
 
 # --- 2) Dependency gating ---
@@ -57,7 +57,7 @@ mkdir -p \
   storage/logs \
   bootstrap/cache
 
-# Permissions normalization (bind-mount safe)
+# Permissions normalization (bind-mount safe; ignore errors if host-owned)
 log "Normalizing permissions for storage and bootstrap/cache"
 chown -R "$(id -u)":"$(id -g)" storage bootstrap/cache || true
 find storage bootstrap/cache -type d -exec chmod 775 {} + || true
@@ -84,6 +84,7 @@ else
 fi
 
 # --- 5) Database connectivity + migrations ---
+# Use getenv to avoid $_ENV pitfalls
 log "DB connectivity check via PDO"
 php -r '
 $dsn = sprintf("mysql:host=%s;port=%s;dbname=%s",
@@ -98,6 +99,7 @@ try {
 }
 '
 
+# Short retry wrapper for migrations to absorb race with DB readiness
 run_migrations() {
   local retries="${1:-5}" sleep_s="${2:-3}"
   for i in $(seq 1 "$retries"); do
@@ -114,7 +116,7 @@ run_migrations() {
 log "Running migrations"
 run_migrations || die "Migrations failed after retries"
 
-# --- 6) Redis verification with driver detection (adds autoload for Predis) ---
+# --- 6) Redis verification with driver detection ---
 log "Redis ping check"
 php -r '
 $host = getenv("REDIS_HOST"); $port = (int)getenv("REDIS_PORT");
@@ -123,8 +125,6 @@ if (extension_loaded("redis")) {
   if (!$r->connect($host, $port)) { fwrite(STDERR, "Redis connect failed\n"); exit(1); }
   echo $r->ping(), "\n"; exit(0);
 }
-$autoload = "/var/www/html/vendor/autoload.php";
-if (file_exists($autoload)) { require $autoload; }
 if (class_exists("Predis\\Client")) {
   $c = new Predis\Client(["host"=>$host,"port"=>$port]);
   echo $c->ping(), "\n"; exit(0);

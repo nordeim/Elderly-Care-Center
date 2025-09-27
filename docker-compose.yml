@@ -30,7 +30,8 @@ services:
       - redis
       - mailhog
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
-    command: ["bash", "-lc", "php artisan serve --host=0.0.0.0 --port=8000"]
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+    # command: ["bash", "-lc", "php artisan serve --host=0.0.0.0 --port=8000"]
     healthcheck:
       test: ["CMD-SHELL", "/usr/local/bin/app-healthcheck.sh"]
       interval: 15s
