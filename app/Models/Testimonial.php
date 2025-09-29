@@ -23,7 +23,7 @@ class Testimonial extends Model
 
     public function media()
     {
-        return $this->morphToMany(MediaItem::class, 'associable', 'media_associations')
+        return $this->morphToMany(MediaItem::class, 'associable', 'media_associations', 'associable_id', 'media_id')
             ->withPivot(['role', 'position'])
             ->orderBy('media_associations.position');
     }

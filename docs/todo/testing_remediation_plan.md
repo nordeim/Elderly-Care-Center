@@ -58,7 +58,8 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 - **tests/Feature/Media/VirtualTourTest.php**
   - [ ] Validate `MediaItem` relationship definitions present; ensure database seeds/migrations align.
 - **media pivot schema alignment**
-  - [ ] Plan: replace manual attach array keys if needed to match pivot columns (only `role`, `position`).
+  - [x] Update `Testimonial::media()` relation to set foreign pivot key to `media_id` so attach uses correct column.
+  - [x] Confirm attach calls remain the same (`role`, `position` only).
 - **tests/Feature/Notifications/ReminderTest.php**
   - [ ] Ensure jobs & notifications dependencies set (queues, metrics). Provide configuration and service container bindings (Notification fake). Requires Mockery for metrics? verify.
 - **tests/Feature/Payments/StripeFlowTest.php**
