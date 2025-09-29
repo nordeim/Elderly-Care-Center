@@ -38,7 +38,8 @@ RUN chmod 755 /usr/bin/composer && composer --version || true
 WORKDIR /var/www/html
 RUN addgroup --system --gid 1000 appgroup \
     && adduser  --system --uid 1000 --ingroup appgroup appuser \
-    && mkdir -p /home/appuser
+    && mkdir -p /home/appuser/.npm \
+    && chown -R appuser:appgroup /home/appuser
 
 # Entrypoint and healthcheck scripts
 COPY --chown=root:root docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -52,6 +53,7 @@ COPY --chown=appuser:appgroup composer.json composer.lock package.json package-l
 ENV HOME=/home/appuser \
     COMPOSER_HOME=/home/appuser/.composer
 USER appuser
+RUN npm config set cache /home/appuser/.npm --global
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts \
     && npm ci
 
