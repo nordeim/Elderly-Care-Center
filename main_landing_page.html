@@ -3,39 +3,292 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Where compassionate care meets modern comfort for every family.">
+    <meta name="theme-color" content="#1C3D5A">
     <title>Elderly Daycare Platform</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css">
-    <link rel="stylesheet" href="http://127.0.0.1:8000/css/accessibility.css">
-</head>
-<body class="bg-slate-100 text-slate-900">
-    <a href="#main-content" class="skip-to-content">Skip to main content</a>
-    <div class="min-h-screen flex items-center justify-center p-6">
-        <main id="main-content" role="main" tabindex="-1" class="w-full max-w-md">
-                <div class="space-y-12">
-        <section class="text-center">
-            <h1 class="text-3xl font-bold">Compassionate Daycare for Your Loved Ones</h1>
-            <p class="mt-4 text-lg">Discover programs, trusted staff, and welcoming spaces designed for seniors.</p>
-            <a href="http://127.0.0.1:8000/book" class="mt-6 inline-block bg-indigo-600 text-white px-6 py-3 rounded-md">Book a Visit</a>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.3/src/regular/style.css">
+
+    <link rel="preload" as="style" href="http://127.0.0.1:8000/build/assets/app-CwlGAipo.css" /><link rel="modulepreload" href="http://127.0.0.1:8000/build/assets/app-BqnEPQfl.js" /><link rel="stylesheet" href="http://127.0.0.1:8000/build/assets/app-CwlGAipo.css" /><script type="module" src="http://127.0.0.1:8000/build/assets/app-BqnEPQfl.js"></script>    <link rel="stylesheet" href="http://127.0.0.1:8000/css/accessibility.css">
+
+    </head>
+<body class="bg-brand-mist text-brand-slate">
+    <div x-data="{ mobileMenuOpen: false }" id="app">
+        <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+            <header class="sticky top-0 z-40 w-full backdrop-glass" data-animate>
+        <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+            <a href="http://127.0.0.1:8000" class="flex items-center gap-2 text-lg font-semibold text-brand-navy">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-gold text-brand-navy font-display text-xl">ED</span>
+                <span>Elderly Daycare Platform</span>
+            </a>
+            <nav class="hidden items-center gap-8 text-sm font-medium text-brand-slate md:flex">
+                <a href="http://127.0.0.1:8000/services" class="transition hover:text-brand-navy">Programs</a>
+                <a href="http://127.0.0.1:8000/staff" class="transition hover:text-brand-navy">Our Team</a>
+                <a href="http://127.0.0.1:8000/virtual-tour" class="transition hover:text-brand-navy">Virtual Tour</a>
+                <a href="http://127.0.0.1:8000/testimonials" class="transition hover:text-brand-navy">Stories</a>
+            </nav>
+            <div class="hidden items-center gap-4 md:flex">
+                <a href="http://127.0.0.1:8000/book" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 rounded-md px-8 rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+        Book a Visit
+    </a>
+            </div>
+            <button
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-navy/20 text-brand-navy md:hidden"
+                type="button"
+                x-on:click="mobileMenuOpen = !mobileMenuOpen"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+            >
+                <span class="ph ph-list text-2xl"></span>
+            </button>
+        </div>
+        <div
+            x-cloak
+            x-show="mobileMenuOpen"
+            x-transition
+            class="border-t border-brand-navy/10 bg-white/95 px-6 py-4 md:hidden"
+        >
+            <nav class="flex flex-col gap-4 text-base text-brand-slate">
+                <a href="http://127.0.0.1:8000/services" class="hover:text-brand-navy">Programs</a>
+                <a href="http://127.0.0.1:8000/staff" class="hover:text-brand-navy">Our Team</a>
+                <a href="http://127.0.0.1:8000/virtual-tour" class="hover:text-brand-navy">Virtual Tour</a>
+                <a href="http://127.0.0.1:8000/testimonials" class="hover:text-brand-navy">Stories</a>
+                <a href="http://127.0.0.1:8000/book" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 rounded-md px-8 rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+        Book a Visit
+    </a>
+            </nav>
+        </div>
+    </header>
+
+        <main id="main-content" role="main" tabindex="-1">
+                <div class="flex flex-col gap-24">
+        <section class="relative overflow-hidden" data-animate>
+            <div class="absolute inset-0">
+                <video
+                    class="h-full w-full object-cover"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    poster="http://127.0.0.1:8000/images/hero-fallback.jpg"
+                >
+                    <source src="http://127.0.0.1:8000/media/hero.webm" type="video/webm">
+                    <source src="http://127.0.0.1:8000/media/hero.mp4" type="video/mp4">
+                </video>
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="relative mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-24 text-white md:flex-row md:items-center">
+                <div class="max-w-xl space-y-6">
+                    <p class="text-sm uppercase tracking-[0.4em] text-brand-amber">Trusted Senior Care</p>
+                    <h1 class="text-4xl font-semibold leading-tight md:text-5xl">
+                        Where compassionate care meets modern comfort for every family
+                    </h1>
+                    <p class="text-lg text-white/80">
+                        Experience day programs designed to enrich, empower, and embrace the seniors you love with evidence-based activities and dedicated caregivers.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="http://127.0.0.1:8000/book" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 rounded-md px-8 rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+        Schedule a Tour
+    </a>
+                        <a href="http://127.0.0.1:8000/virtual-tour" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-8 rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
+        <span class="ph ph-play"></span>
+                            Watch Virtual Tour
+    </a>
+                    </div>
+                </div>
+                <div class="grid w-full max-w-sm grid-cols-1 gap-4 rounded-3xl bg-white/10 p-6 text-white backdrop-blur md:grid-cols-3 md:max-w-none">
+                    <div class="flex flex-col gap-2">
+                        <span class="text-3xl font-semibold">12+</span>
+                        <span class="text-sm text-white/70">Years providing joyful day programs</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <span class="text-3xl font-semibold">0</span>
+                        <span class="text-sm text-white/70">Families supported with personalized plans</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <span class="text-3xl font-semibold">0</span>
+                        <span class="text-sm text-white/70">Certified caregivers on our team</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-semibold">Featured Services</h2>
-            <div class="mt-6 grid gap-6 md:grid-cols-2">
-                            </div>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-semibold">Testimonials</h2>
-            <div class="mt-6 space-y-6">
-                            </div>
-            <div class="mt-8 text-center">
-                <a href="http://127.0.0.1:8000/virtual-tour" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-md">
-                    Explore Our Virtual Tour
+        <section class="mx-auto w-full max-w-6xl px-6" data-animate>
+            <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <p class="text-sm uppercase tracking-[0.3em] text-brand-amber">Programs</p>
+                    <h2 class="text-3xl font-semibold text-brand-navy">Curated experiences for every family</h2>
+                </div>
+                <a href="http://127.0.0.1:8000/services" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-navy">
+                    Explore all services
+                    <span class="ph ph-arrow-right"></span>
                 </a>
+            </div>
+            <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                                    <p class="text-brand-slate">Our program highlights are being curated. Check back soon.</p>
+                            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-brand-mist to-white py-20" data-animate>
+            <div class="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 md:grid-cols-2">
+                <div class="space-y-6">
+                    <p class="text-sm uppercase tracking-[0.3em] text-brand-amber">Care Philosophy</p>
+                    <h2 class="text-3xl font-semibold text-brand-navy">Dignity-first care, enriched by community</h2>
+                    <p class="text-brand-slate">
+                        We partner with families to craft meaningful everyday experiences—combining clinical expertise, warm hospitality, and technology-enabled safety.
+                    </p>
+                    <ul class="space-y-4 text-brand-slate">
+                        <li class="flex items-start gap-3">
+                            <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-amber/30 text-brand-amber">
+                                <span class="ph ph-shield-check"></span>
+                            </span>
+                            Comprehensive safety protocols with registered nurses on-site.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-amber/30 text-brand-amber">
+                                <span class="ph ph-heart"></span>
+                            </span>
+                            Daily enrichment activities tailored to cognitive and mobility needs.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-amber/30 text-brand-amber">
+                                <span class="ph ph-handshake"></span>
+                            </span>
+                            Family touchpoints every step of the journey with transparent updates.
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-elevated flex flex-col rounded-3xl bg-white/95 shadow-xl-soft backdrop-blur transition-transform transition-shadow duration-300 ease-out relative overflow-hidden p-8" data-animate="data-animate">
+    
+    <div class="flex-1">
+        <div class="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-brand-amber/40 blur-3xl"></div>
+                    <div class="relative space-y-6">
+                        <h3 class="text-xl font-semibold text-brand-navy">Our Promise</h3>
+                        <ol class="space-y-4 border-l-2 border-brand-amber/70 pl-6 text-brand-slate">
+                            <li>
+                                <h4 class="text-lg font-semibold text-brand-navy">Warm Welcome</h4>
+                                Every member is greeted personally with a tailored onboarding experience.
+                            </li>
+                            <li>
+                                <h4 class="text-lg font-semibold text-brand-navy">Engaged Days</h4>
+                                We balance wellness, social, and creative sessions led by certified specialists.
+                            </li>
+                            <li>
+                                <h4 class="text-lg font-semibold text-brand-navy">Empowered Families</h4>
+                                Transparent communication with digital updates and caregiver training resources.
+                            </li>
+                        </ol>
+                    </div>
+    </div>
+
+    </div>
+            </div>
+        </section>
+
+        <section class="bg-brand-navy py-20 text-white" data-testimonials data-animate>
+            <div class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6">
+                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.3em] text-brand-amber">Testimonials</p>
+                        <h2 class="text-3xl font-semibold">Families who trust us</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" class="h-3 w-3 rounded-full bg-white/40 opacity-40 transition" data-testimonials-dot aria-label="Go to previous testimonial"></button>
+                        <button type="button" class="h-3 w-3 rounded-full bg-white/40 opacity-40 transition" data-testimonials-dot aria-label="Go to next testimonial"></button>
+                        <button type="button" class="h-3 w-3 rounded-full bg-white/40 opacity-40 transition" data-testimonials-dot aria-label="Go to next testimonial"></button>
+                    </div>
+                </div>
+                <div class="relative" data-testimonials-viewport>
+                    <div class="testimonial-marquee">
+                                                    <p class="px-4 text-white/80">Testimonials are coming soon. Check back for stories from our families.</p>
+                                            </div>
+                </div>
+                <div class="mt-4 text-sm text-white/70">
+                    Hover to pause. Stories auto-advance every few seconds and can be navigated with the dots.
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto w-full max-w-6xl px-6" data-animate>
+            <div class="grid gap-10 rounded-3xl bg-brand-mist p-10 md:grid-cols-[2fr,1fr]">
+                <div class="space-y-4">
+                    <p class="text-sm uppercase tracking-[0.3em] text-brand-amber">Virtual Tour</p>
+                    <h2 class="text-3xl font-semibold text-brand-navy">Step inside from anywhere</h2>
+                    <p class="text-brand-slate">
+                        Explore our sensory rooms, wellness lounges, and technology-enabled safety systems. Schedule an in-person visit to feel the warmth first-hand.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm text-brand-navy">
+                            <span class="ph ph-car"></span>
+                            Accessible transport
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm text-brand-navy">
+                            <span class="ph ph-bowl-food"></span>
+                            Chef-crafted meals
+                        </span>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm text-brand-navy">
+                            <span class="ph ph-brain"></span>
+                            Memory care support
+                        </span>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="http://127.0.0.1:8000/virtual-tour" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 rounded-md px-8 rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+        Explore Virtual Tour
+    </a>
+                        <a href="http://127.0.0.1:8000/book" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-8 rounded-full border-brand-navy px-6 py-3 text-brand-navy hover:bg-brand-navy hover:text-white">
+        Plan a Visit
+                            <span class="ph ph-arrow-right"></span>
+    </a>
+                    </div>
+                </div>
+                <div class="relative overflow-hidden rounded-3xl">
+                    <img src="http://127.0.0.1:8000/images/virtual-tour-preview.jpg" alt="Preview of Elderly Daycare facility" class="h-full w-full object-cover" loading="lazy">
+                    <div class="absolute inset-0 bg-brand-navy/20"></div>
+                </div>
             </div>
         </section>
     </div>
         </main>
+
+            <footer class="mt-24 bg-brand-navy py-16 text-white" data-animate>
+        <div class="mx-auto grid w-full max-w-6xl gap-10 px-6 md:grid-cols-4">
+            <div class="space-y-4">
+                <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-gold text-brand-navy font-display text-xl">ED</span>
+                <p class="text-sm text-white/70">Building inclusive communities where seniors thrive every day.</p>
+            </div>
+            <div class="space-y-3 text-sm">
+                <h3 class="text-base font-semibold">Quick Links</h3>
+                <a href="http://127.0.0.1:8000/services" class="block text-white/80 hover:text-white">Programs</a>
+                <a href="http://127.0.0.1:8000/staff" class="block text-white/80 hover:text-white">Our Team</a>
+                <a href="http://127.0.0.1:8000/virtual-tour" class="block text-white/80 hover:text-white">Virtual Tour</a>
+                <a href="http://127.0.0.1:8000/book" class="block text-white/80 hover:text-white">Book a Visit</a>
+            </div>
+            <div class="space-y-3 text-sm">
+                <h3 class="text-base font-semibold">Contact</h3>
+                <p class="text-white/80">123 Compassion Lane<br>San Francisco, CA</p>
+                <a href="tel:+15551234567" class="block text-white/80 hover:text-white">(555) 123-4567</a>
+                <a href="mailto:care@elderly-daycare.com" class="block text-white/80 hover:text-white">care@elderly-daycare.com</a>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-base font-semibold">Newsletter</h3>
+                <p class="text-sm text-white/70">Stay informed about caregiver resources, events, and new programs.</p>
+                <form action="#" method="post" class="flex flex-col gap-3" aria-label="Newsletter subscription">
+                    <label for="newsletter-email" class="sr-only">Email</label>
+                    <input type="email" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full rounded-full border-white/30 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/60 focus-visible:ring-white" id="newsletter-email" placeholder="you@example.com" required="required">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+        Subscribe
+    </button>
+                </form>
+            </div>
+        </div>
+        <div class="mt-12 border-t border-white/10 pt-6 text-center text-xs text-white/60">
+            © 2025 Elderly Daycare Platform. All rights reserved.
+        </div>
+    </footer>
     </div>
 </body>
 </html>

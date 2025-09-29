@@ -50,7 +50,7 @@ class StripeWebhookController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    protected function handleSucceeded(Event $event): void
+    public function handleSucceeded(Event $event): void
     {
         $intent = $event->data->object;
         $payment = Payment::where('stripe_payment_intent_id', $intent->id)->first();
@@ -72,7 +72,7 @@ class StripeWebhookController extends Controller
         );
     }
 
-    protected function handleFailed(Event $event): void
+    public function handleFailed(Event $event): void
     {
         $intent = $event->data->object;
         $payment = Payment::where('stripe_payment_intent_id', $intent->id)->first();
@@ -93,7 +93,7 @@ class StripeWebhookController extends Controller
         );
     }
 
-    protected function handleRefunded(Event $event): void
+    public function handleRefunded(Event $event): void
     {
         $charge = $event->data->object;
         $intentId = $charge->payment_intent ?? null;

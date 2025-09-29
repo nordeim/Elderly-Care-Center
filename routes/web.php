@@ -50,8 +50,9 @@ Route::middleware('web')->group(function () {
         Route::get('/dashboard', [CaregiverDashboardController::class, 'index'])->name('dashboard');
         Route::post('/preferences', [CaregiverDashboardController::class, 'updatePreferences'])->name('preferences.update');
         Route::get('/calendar/export', BookingExportController::class)->name('calendar.export');
-        Route::get('/payments/bookings/{booking}', [CheckoutController::class, 'show'])->name('payments.checkout.show');
     });
+
+    Route::middleware(['auth', 'can:access-caregiver'])->get('/caregiver/payments/bookings/{booking}', [CheckoutController::class, 'show'])->name('payments.checkout.show');
 
     Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->as('admin.')->group(function () {
         Route::get('/', [BookingInboxController::class, 'index'])->name('dashboard');
