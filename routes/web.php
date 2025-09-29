@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\BookingInboxController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Site\ServicesController;
 use App\Http\Controllers\Site\StaffController as SiteStaffController;
 use App\Http\Controllers\Site\TestimonialsController;
 use App\Http\Controllers\Site\VirtualTourController;
+use App\Http\Controllers\Payments\CheckoutController;
 use App\Http\Controllers\Metrics\BookingMetricsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HealthController;
@@ -41,11 +43,14 @@ Route::middleware('web')->group(function () {
         Route::get('/dashboard', [CaregiverDashboardController::class, 'index'])->name('dashboard');
         Route::post('/preferences', [CaregiverDashboardController::class, 'updatePreferences'])->name('preferences.update');
         Route::get('/calendar/export', BookingExportController::class)->name('calendar.export');
+        Route::get('/payments/bookings/{booking}', [CheckoutController::class, 'show'])->name('payments.checkout.show');
     });
 
     Route::middleware(['auth', 'can:access-admin'])->prefix('admin')->as('admin.')->group(function () {
         Route::get('/', [BookingInboxController::class, 'index'])->name('dashboard');
         Route::post('/bookings/{booking}/status', [BookingInboxController::class, 'updateStatus'])->name('bookings.status');
+
+        Route::get('/analytics', AnalyticsController::class)->name('analytics');
 
         Route::resource('bookings', BookingInboxController::class)->only(['index']);
         Route::resource('services', ServiceController::class);

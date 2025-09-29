@@ -47,18 +47,18 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [ ] Ensure controller invocation returns expected dataset (align with view `resources/views/admin/analytics.blade.php`).
   - [ ] After route addition, verify admin authorization middleware matches test expectations.
 - **seedAnalyticsData() adjustments**
-  - [ ] Create distinct booking slots (or increment slot IDs) to avoid unique constraint collisions on `bookings`.
-  - [ ] Consider seeding via factories once available.
+  - [ ] Create distinct booking slots per booking (duplicate slot currently causes unique constraint violation).
+  - [ ] Prefer using helper to generate slots dynamically rather than hard-coding IDs.
 - **tests/Feature/Bookings/CreateBookingTest.php**
   - [ ] Ensure booking store route accessible without auth (CSRF?). Possibly disable mail job.
 - **VerifyCsrfToken middleware handling**
-  - [ ] In test `setUp`, call `$this->withoutMiddleware(VerifyCsrfToken::class)` or include `_token` in payload.
+  - [ ] In test `setUp`, disable CSRF middleware or supply token helper (e.g., `withoutMiddleware(VerifyCsrfToken::class)`).
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**
   - [ ] Validate `MediaItem` relationship definitions present; ensure database seeds/migrations align.
 - **media pivot schema alignment**
-  - [ ] Update attachment call to use `media_id` (matches migration) or adjust migration/test accordingly.
+  - [ ] Use `media()` relationship (which already maps to `media_id`) without overriding columns; ensure attach payload references valid pivot keys only.
 - **tests/Feature/Notifications/ReminderTest.php**
   - [ ] Ensure jobs & notifications dependencies set (queues, metrics). Provide configuration and service container bindings (Notification fake). Requires Mockery for metrics? verify.
 - **tests/Feature/Payments/StripeFlowTest.php**
@@ -67,7 +67,7 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 - **Payments routing & Stripe SDK**
   - [ ] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
   - [ ] Register webhook route(s) for `StripeWebhookController` if required.
-  - [ ] Add `stripe/stripe-php` dependency or replace `Stripe\Event` usage with stub/DTO.
+  - [ ] Add `stripe/stripe-php` dependency (done) so `Stripe\Event` is available to tests.
 
 ### 6. Global Config Adjustments for Tests
 - **config/metrics.php**
