@@ -88,77 +88,87 @@ class AnalyticsDashboardTest extends TestCase
             'language_preference' => 'en',
         ]);
 
-        $start = Carbon::now()->subDays(5)->setTime(10, 0);
-        $end = (clone $start)->addHours(3);
+        $bookingSpecs = [
+            ['status' => 'pending', 'offsetDays' => 5],
+            ['status' => 'confirmed', 'offsetDays' => 4],
+            ['status' => 'confirmed', 'offsetDays' => 3],
+            ['status' => 'confirmed', 'offsetDays' => 2],
+        ];
 
-        $slot = BookingSlot::create([
-            'service_id' => $service->id,
-            'facility_id' => $facility->id,
-            'start_at' => $start,
-            'end_at' => $end,
-            'capacity' => 5,
-            'available_count' => 4,
-            'lock_version' => 1,
-        ]);
+        $confirmedBookings = [];
 
-        Booking::create([
-            'slot_id' => $slot->id,
-            'client_id' => $client->id,
-            'status' => 'pending',
-            'uuid' => (string) Str::uuid(),
-            'created_at' => now()->subDays(4),
-        ]);
+        foreach ($bookingSpecs as $spec) {
+            $startAt = Carbon::now()->subDays($spec['offsetDays'])->setTime(10, 0);
+            $endAt = (clone $startAt)->addHours(3);
 
-        Booking::create([
-            'slot_id' => $slot->id,
-            'client_id' => $client->id,
-            'status' => 'confirmed',
-            'uuid' => (string) Str::uuid(),
-            'created_at' => now()->subDays(3),
-        ]);
+            $slot = BookingSlot::create([
+                'service_id' => $service->id,
+                'facility_id' => $facility->id,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'capacity' => 5,
+                'available_count' => 4,
+                'lock_version' => 1,
+            ]);
 
-        Booking::create([
-            'slot_id' => $slot->id,
-            'client_id' => $client->id,
-            'status' => 'confirmed',
-            'uuid' => (string) Str::uuid(),
-            'created_at' => now()->subDays(2),
-        ]);
+            $booking = Booking::create([
+                'slot_id' => $slot->id,
+                'client_id' => $client->id,
+                'status' => $spec['status'],
+                'uuid' => (string) Str::uuid(),
+                'created_at' => $startAt->copy(),
+                'updated_at' => $startAt->copy(),
+            ]);
 
-        Booking::create([
-            'slot_id' => $slot->id,
-            'client_id' => $client->id,
-            'status' => 'confirmed',
-            'uuid' => (string) Str::uuid(),
-            'created_at' => now()->subDay(),
-        ]);
+            if ($spec['status'] === 'confirmed') {
+                $confirmedBookings[] = $booking;
+            }
+        }
 
-        Payment::create([
-            'booking_id' => 2,
-            'stripe_payment_intent_id' => 'pi_1',
-            'status' => Payment::STATUS_SUCCEEDED,
-            'amount_cents' => 5000,
-            'currency' => 'usd',
-            'created_at' => now()->subDays(2),
-        ]);
+        if (count($confirmedBookings) >= 3) {
+            Payment::create([
+                'booking_id' => $confirmedBookings[0]->id,
+                'stripe_payment_intent_id' => 'pi_1',
+                'status' => Payment::STATUS_SUCCEEDED,
+                'amount_cents' => 5000,
+                'currency' => 'usd',
+                'created_at' => now()->subDays(2),
+            ]);
 
-        Payment::create([
-            'booking_id' => 3,
-            'stripe_payment_intent_id' => 'pi_2',
-            'status' => Payment::STATUS_SUCCEEDED,
-            'amount_cents' => 5000,
-            'currency' => 'usd',
-            'created_at' => now()->subDay(),
-        ]);
+            Payment::create([
+                'booking_id' => $confirmedBookings[1]->id,
+                'stripe_payment_intent_id' => 'pi_2',
+                'status' => Payment::STATUS_SUCCEEDED,
+                'amount_cents' => 5000,
+                'currency' => 'usd',
+                'created_at' => now()->subDay(),
+            ]);
 
-        Payment::create([
-            'booking_id' => 4,
-            'stripe_payment_intent_id' => 'pi_3',
-            'status' => Payment::STATUS_CANCELLED,
-            'amount_cents' => 5000,
-            'currency' => 'usd',
-            'created_at' => now()->subDay(),
-        ]);
+            Payment::create([
+                'booking_id' => $confirmedBookings[2]->id,
+                'stripe_payment_intent_id' => 'pi_3',
+                'status' => Payment::STATUS_CANCELLED,
+                'amount_cents' => 5000,
+                'currency' => 'usd',
+                'created_at' => now()->subDay(),
+            ]);
+
+            BookingNotification::create([
+                'booking_id' => $confirmedBookings[0]->id,
+                'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
+                'channel' => 'email',
+                'status' => BookingNotification::STATUS_SENT,
+                'scheduled_for' => now()->subHours(2),
+            ]);
+
+            BookingNotification::create([
+                'booking_id' => $confirmedBookings[1]->id,
+                'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
+                'channel' => 'email',
+                'status' => BookingNotification::STATUS_FAILED,
+                'scheduled_for' => now()->subHours(1),
+            ]);
+        }
 
         if (class_exists(MediaItem::class)) {
             MediaItem::create([
@@ -168,21 +178,5 @@ class AnalyticsDashboardTest extends TestCase
                 'category' => 'virtual_tour',
             ]);
         }
-
-        BookingNotification::create([
-            'booking_id' => 2,
-            'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
-            'channel' => 'email',
-            'status' => BookingNotification::STATUS_SENT,
-            'scheduled_for' => now()->subHours(2),
-        ]);
-
-        BookingNotification::create([
-            'booking_id' => 3,
-            'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
-            'channel' => 'email',
-            'status' => BookingNotification::STATUS_FAILED,
-            'scheduled_for' => now()->subHours(1),
-        ]);
     }
 }

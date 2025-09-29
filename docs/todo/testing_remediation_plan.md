@@ -43,31 +43,31 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [ ] Use factories if available for maintainability.
   - [ ] Confirm route names `admin.analytics` exist.
 - **routes/web.php / app/Http/Controllers/Admin/AnalyticsController.php**
-  - [ ] Register `Route::get('/analytics', AnalyticsController::class)->name('analytics')` within the admin group.
+  - [x] Register `Route::get('/analytics', AnalyticsController::class)->name('analytics')` within the admin group.
   - [ ] Ensure controller invocation returns expected dataset (align with view `resources/views/admin/analytics.blade.php`).
-  - [ ] After route addition, verify admin authorization middleware matches test expectations.
 - **seedAnalyticsData() adjustments**
-  - [ ] Create distinct booking slots per booking (duplicate slot currently causes unique constraint violation).
+  - [x] Create distinct booking slots per booking (duplicate slot currently causes unique constraint violation).
   - [ ] Prefer using helper to generate slots dynamically rather than hard-coding IDs.
 - **tests/Feature/Bookings/CreateBookingTest.php**
   - [ ] Ensure booking store route accessible without auth (CSRF?). Possibly disable mail job.
-- **VerifyCsrfToken middleware handling**
-  - [ ] In test `setUp`, disable CSRF middleware or supply token helper (e.g., `withoutMiddleware(VerifyCsrfToken::class)`).
+  - [ ] Plan: override `setUp()` to disable CSRF via `$this->withoutMiddleware(VerifyCsrfToken::class)`.
+**VerifyCsrfToken middleware handling**
+  - [ ] Disable CSRF middleware for targeted test (use `$this->withoutMiddleware(VerifyCsrfToken::class)` in `setUp`).
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**
   - [ ] Validate `MediaItem` relationship definitions present; ensure database seeds/migrations align.
 - **media pivot schema alignment**
-  - [ ] Use `media()` relationship (which already maps to `media_id`) without overriding columns; ensure attach payload references valid pivot keys only.
+  - [ ] Plan: replace manual attach array keys if needed to match pivot columns (only `role`, `position`).
 - **tests/Feature/Notifications/ReminderTest.php**
   - [ ] Ensure jobs & notifications dependencies set (queues, metrics). Provide configuration and service container bindings (Notification fake). Requires Mockery for metrics? verify.
 - **tests/Feature/Payments/StripeFlowTest.php**
   - [ ] After adding Mockery, confirm `StripeService` dependencies (config, routes) satisfied.
   - [ ] Optionally wrap with `withoutExceptionHandling()` for debug.
 - **Payments routing & Stripe SDK**
-  - [ ] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
+  - [x] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
   - [ ] Register webhook route(s) for `StripeWebhookController` if required.
-  - [ ] Add `stripe/stripe-php` dependency (done) so `Stripe\Event` is available to tests.
+  - [x] Add `stripe/stripe-php` dependency (done) so `Stripe\Event` is available to tests.
 
 ### 6. Global Config Adjustments for Tests
 - **config/metrics.php**
