@@ -13,6 +13,7 @@ class VirtualTourTest extends TestCase
     {
         $heroMedia = MediaItem::create([
             'uuid' => (string) Str::uuid(),
+            'title' => 'Campus Walkthrough',
             'file_url' => 'https://cdn.example.com/media/virtual-tour/hero.mp4',
             'mime_type' => 'video/mp4',
             'size_bytes' => 45_000_000,
@@ -32,6 +33,7 @@ class VirtualTourTest extends TestCase
 
         $galleryMedia = MediaItem::create([
             'uuid' => (string) Str::uuid(),
+            'title' => 'Common Area Walkthrough',
             'file_url' => 'https://cdn.example.com/media/virtual-tour/common-area.mp4',
             'mime_type' => 'video/mp4',
             'size_bytes' => 28_000_000,

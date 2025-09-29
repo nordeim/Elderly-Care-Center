@@ -126,6 +126,11 @@ class AnalyticsDashboardTest extends TestCase
         }
 
         if (count($confirmedBookings) >= 3) {
+            $caregiverProfiles = CaregiverProfile::factory()
+                ->count(2)
+                ->for($client, 'client')
+                ->create();
+
             Payment::create([
                 'booking_id' => $confirmedBookings[0]->id,
                 'stripe_payment_intent_id' => 'pi_1',
@@ -155,7 +160,7 @@ class AnalyticsDashboardTest extends TestCase
 
             BookingNotification::create([
                 'booking_id' => $confirmedBookings[0]->id,
-                'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
+                'caregiver_profile_id' => $caregiverProfiles[0]->id,
                 'channel' => 'email',
                 'status' => BookingNotification::STATUS_SENT,
                 'scheduled_for' => now()->subHours(2),
@@ -163,7 +168,7 @@ class AnalyticsDashboardTest extends TestCase
 
             BookingNotification::create([
                 'booking_id' => $confirmedBookings[1]->id,
-                'caregiver_profile_id' => CaregiverProfile::factory()->create()->id,
+                'caregiver_profile_id' => $caregiverProfiles[1]->id,
                 'channel' => 'email',
                 'status' => BookingNotification::STATUS_FAILED,
                 'scheduled_for' => now()->subHours(1),
