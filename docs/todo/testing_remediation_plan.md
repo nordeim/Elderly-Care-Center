@@ -67,7 +67,7 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [ ] Optionally wrap with `withoutExceptionHandling()` for debug.
 - **Payments routing & Stripe SDK**
   - [x] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
-  - [ ] Register webhook route(s) for `StripeWebhookController` if required.
+  - [ ] Register webhook route(s) for `StripeWebhookController` (e.g., `Route::post('/payments/stripe/webhook', StripeWebhookController::class)`).
   - [x] Add `stripe/stripe-php` dependency (done) so `Stripe\Event` is available to tests.
 
 ### 6. Global Config Adjustments for Tests
