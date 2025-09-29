@@ -49,6 +49,8 @@ Thumbs.db
 /coverage/
 /dist/
 /build/
+/.vite/
+/public/build/
 /.yarn/
 /.pnp.js
 /.nyc_output

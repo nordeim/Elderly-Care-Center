@@ -8,6 +8,8 @@ RUN apt-get update \
         libpng-dev libjpeg-dev libfreetype6-dev \
         libxml2-dev libzip-dev libonig-dev \
         zip unzip \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install mbstring pdo_mysql exif pcntl bcmath gd zip opcache \
     && pecl install redis \
@@ -44,13 +46,14 @@ COPY --chown=root:root docker/app-healthcheck.sh /usr/local/bin/app-healthcheck.
 RUN chmod 755 /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
 
 # Copy Composer manifests first (cache-friendly)
-COPY --chown=appuser:appgroup composer.json composer.lock ./
+COPY --chown=appuser:appgroup composer.json composer.lock package.json package-lock.json ./
 
 # Set Composer environment and install vendors without scripts (cache preserved)
 ENV HOME=/home/appuser \
     COMPOSER_HOME=/home/appuser/.composer
 USER appuser
-RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts \
+    && npm ci
 
 # Copy application source (vendor excluded via .dockerignore)
 USER root
@@ -59,11 +62,13 @@ COPY --chown=appuser:appgroup . .
 # Run artisan-dependent composer scripts now that code is present
 USER appuser
 RUN composer run-script post-autoload-dump || true \
-    && composer dump-autoload --optimize --no-interaction
+    && composer dump-autoload --optimize --no-interaction \
+    && npm run build
 
 # Normalize ownership and deterministic permissions
 USER root
-RUN chown -R appuser:appgroup /var/www/html /home/appuser \
+RUN rm -rf node_modules /home/appuser/.npm \
+    && chown -R appuser:appgroup /var/www/html /home/appuser \
     && find /var/www/html /home/appuser -type d -exec chmod 775 {} + \
     && find /var/www/html /home/appuser -type f -exec chmod 664 {} + \
     && chmod 755 /usr/local/bin/entrypoint.sh /usr/local/bin/app-healthcheck.sh
