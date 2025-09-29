@@ -16,8 +16,16 @@ export function initScrollAnimations() {
     entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in-up')
-          observer.unobserve(entry.target)
+          const target = entry.target
+          const delay = Number.parseInt(target.dataset.animateDelay || '0', 10)
+
+          if (delay) {
+            target.style.animationDelay = `${delay}ms`
+          }
+
+          target.classList.add('animate-fade-in-up')
+          target.classList.remove('opacity-0', 'translate-y-5')
+          observer.unobserve(target)
         }
       })
     },

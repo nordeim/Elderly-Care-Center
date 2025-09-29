@@ -14,7 +14,9 @@
                 <a href="{{ route('testimonials.index') }}" class="transition hover:text-brand-navy">Stories</a>
             </nav>
             <div class="hidden items-center gap-4 md:flex">
-                <a href="{{ route('booking.create') }}" class="cta-button">Book a Visit</a>
+                <x-ui.button href="{{ route('booking.create') }}" size="lg" class="rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+                    Book a Visit
+                </x-ui.button>
             </div>
             <button
                 class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-navy/20 text-brand-navy md:hidden"
@@ -37,7 +39,9 @@
                 <a href="{{ route('staff.index') }}" class="hover:text-brand-navy">Our Team</a>
                 <a href="{{ route('virtual-tour.show') }}" class="hover:text-brand-navy">Virtual Tour</a>
                 <a href="{{ route('testimonials.index') }}" class="hover:text-brand-navy">Stories</a>
-                <a href="{{ route('booking.create') }}" class="cta-button text-center">Book a Visit</a>
+                <x-ui.button href="{{ route('booking.create') }}" size="lg" class="rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+                    Book a Visit
+                </x-ui.button>
             </nav>
         </div>
     </header>
@@ -70,11 +74,13 @@
                         Experience day programs designed to enrich, empower, and embrace the seniors you love with evidence-based activities and dedicated caregivers.
                     </p>
                     <div class="flex flex-wrap items-center gap-4">
-                        <a href="{{ route('booking.create') }}" class="cta-button">Schedule a Tour</a>
-                        <a href="{{ route('virtual-tour.show') }}" class="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition hover:bg-white/10">
+                        <x-ui.button href="{{ route('booking.create') }}" size="lg" class="rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+                            Schedule a Tour
+                        </x-ui.button>
+                        <x-ui.button href="{{ route('virtual-tour.show') }}" size="lg" variant="outline" class="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10">
                             <span class="ph ph-play"></span>
                             Watch Virtual Tour
-                        </a>
+                        </x-ui.button>
                     </div>
                 </div>
                 <div class="grid w-full max-w-sm grid-cols-1 gap-4 rounded-3xl bg-white/10 p-6 text-white backdrop-blur md:grid-cols-3 md:max-w-none">
@@ -107,12 +113,14 @@
             </div>
             <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 @forelse ($services as $service)
-                    <article class="card-elevated h-full p-8" data-animate>
-                        <div class="flex items-center gap-3 text-sm font-semibold text-brand-amber">
-                            <span class="ph ph-sparkle text-lg"></span>
-                            Featured Program
-                        </div>
-                        <h3 class="mt-4 text-2xl font-semibold text-brand-navy">{{ $service->name }}</h3>
+                    <x-ui.card data-animate class="h-full p-8">
+                        <x-slot:header>
+                            <div class="flex items-center gap-3 text-sm font-semibold text-brand-amber">
+                                <span class="ph ph-sparkle text-lg"></span>
+                                Featured Program
+                            </div>
+                        </x-slot:header>
+                        <h3 class="text-2xl font-semibold text-brand-navy">{{ $service->name }}</h3>
                         <p class="mt-3 text-sm text-brand-ash">{{ Str::limit($service->description, 160) }}</p>
                         <div class="mt-6 flex items-center gap-3 text-sm text-brand-slate">
                             <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-mist text-brand-navy">
@@ -120,7 +128,7 @@
                             </span>
                             <span>{{ $service->duration_minutes }} minute sessions</span>
                         </div>
-                    </article>
+                    </x-ui.card>
                 @empty
                     <p class="text-brand-slate">Our program highlights are being curated. Check back soon.</p>
                 @endforelse
@@ -156,7 +164,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-elevated relative overflow-hidden p-8" data-animate>
+                <x-ui.card data-animate class="relative overflow-hidden p-8">
                     <div class="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-brand-amber/40 blur-3xl"></div>
                     <div class="relative space-y-6">
                         <h3 class="text-xl font-semibold text-brand-navy">Our Promise</h3>
@@ -175,7 +183,7 @@
                             </li>
                         </ol>
                     </div>
-                </div>
+                </x-ui.card>
             </div>
         </section>
 
@@ -195,7 +203,7 @@
                 <div class="relative" data-testimonials-viewport>
                     <div class="testimonial-marquee">
                         @forelse ($testimonials as $testimonial)
-                            <article class="card-elevated mx-4 flex w-80 shrink-0 flex-col gap-4 bg-white/95 p-6 text-brand-slate">
+                            <x-ui.card class="mx-4 flex w-80 shrink-0 flex-col gap-4 bg-white/95 p-6 text-brand-slate">
                                 <div class="flex items-center gap-3 text-brand-amber">
                                     <span class="ph ph-quotes text-2xl"></span>
                                     <span class="text-sm font-semibold uppercase tracking-[0.3em]">Success Story</span>
@@ -204,7 +212,7 @@
                                 <div class="mt-4 text-xs uppercase tracking-[0.2em] text-brand-ash">
                                     {{ optional($testimonial->client)->first_name ?? 'Family Caregiver' }}
                                 </div>
-                            </article>
+                            </x-ui.card>
                         @empty
                             <p class="px-4 text-white/80">Testimonials are coming soon. Check back for stories from our families.</p>
                         @endforelse
@@ -239,11 +247,13 @@
                         </span>
                     </div>
                     <div class="flex gap-4">
-                        <a href="{{ route('virtual-tour.show') }}" class="cta-button">Explore Virtual Tour</a>
-                        <a href="{{ route('booking.create') }}" class="inline-flex items-center gap-2 rounded-full border border-brand-navy px-6 py-3 text-brand-navy transition hover:bg-brand-navy hover:text-white">
+                        <x-ui.button href="{{ route('virtual-tour.show') }}" size="lg" class="rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+                            Explore Virtual Tour
+                        </x-ui.button>
+                        <x-ui.button href="{{ route('booking.create') }}" size="lg" variant="outline" class="rounded-full border-brand-navy px-6 py-3 text-brand-navy hover:bg-brand-navy hover:text-white">
                             Plan a Visit
                             <span class="ph ph-arrow-right"></span>
-                        </a>
+                        </x-ui.button>
                     </div>
                 </div>
                 <div class="relative overflow-hidden rounded-3xl">
@@ -280,8 +290,16 @@
                 <p class="text-sm text-white/70">Stay informed about caregiver resources, events, and new programs.</p>
                 <form action="#" method="post" class="flex flex-col gap-3" aria-label="Newsletter subscription">
                     <label for="newsletter-email" class="sr-only">Email</label>
-                    <input id="newsletter-email" type="email" placeholder="you@example.com" class="w-full rounded-full border border-white/30 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-white focus:outline-none" required>
-                    <button type="submit" class="cta-button w-full">Subscribe</button>
+                    <x-ui.input
+                        id="newsletter-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        required
+                        class="w-full rounded-full border-white/30 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/60 focus-visible:ring-white"
+                    />
+                    <x-ui.button type="submit" class="w-full rounded-full bg-brand-gold text-brand-navy hover:bg-brand-amber">
+                        Subscribe
+                    </x-ui.button>
                 </form>
             </div>
         </div>
