@@ -95,3 +95,34 @@ If you like, I can help you write a small shell script or alias to clean up volu
 [2]: https://stackoverflow.com/questions/45511956/remove-a-named-volume-with-docker-compose/59060829?utm_source=chatgpt.com "Remove a named volume with docker-compose? - Stack Overflow"
 [3]: https://stackoverflow.com/questions/76347241/cant-remove-docker-unnamed-volumes?utm_source=chatgpt.com "Can't remove docker unnamed volumes - Stack Overflow"
 
+---
+
+Given your `docker‑compose.yml`, to run `php artisan test` *inside* the `app` service container, a correct syntax would be:
+
+```bash
+docker compose exec app php artisan test
+```
+
+(or if you use the old command form)
+
+```bash
+docker-compose exec app php artisan test
+```
+
+If you want the container to start fresh (e.g. not using an already running container) and then run the test, you could use:
+
+```bash
+docker compose run --rm app php artisan test
+```
+
+A few caveats / enhancements:
+
+* Use `exec` when the container is already running (less overhead).
+* Use `--rm` with `run` so the temporary container is cleaned up.
+* If your `app` container’s entrypoint or command overrides things, ensure the test command is valid in context.
+* You might also want to set the environment to `testing` when running tests, e.g.:
+
+  ```bash
+  docker compose exec app php artisan test --env=testing
+  ```
+
