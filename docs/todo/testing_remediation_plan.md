@@ -57,7 +57,7 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 **VerifyCsrfToken middleware handling**
   - [x] Disable CSRF middleware for targeted test (use `$this->withoutMiddleware(VerifyCsrfToken::class)` in `setUp`).
 - **Session & referer prerequisites**
-  - [ ] Seed `_token` in session and include in POST payload or disable session middleware for booking flow test.
+  - [x] Seed `_token` in session and include in POST payload or disable session middleware for booking flow test.
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**

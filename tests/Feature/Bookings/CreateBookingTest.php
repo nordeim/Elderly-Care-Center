@@ -8,6 +8,8 @@ use App\Models\Service;
 use App\Models\BookingSlot;
 use Illuminate\Support\Carbon;
 use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class CreateBookingTest extends TestCase
 {
@@ -15,7 +17,11 @@ class CreateBookingTest extends TestCase
     {
         parent::setUp();
 
-        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->withoutMiddleware([
+            VerifyCsrfToken::class,
+            StartSession::class,
+            ShareErrorsFromSession::class,
+        ]);
     }
 
     public function test_create_booking_happy_path(): void
@@ -47,10 +53,11 @@ class CreateBookingTest extends TestCase
         ]);
 
         // Act: submit booking request as guest
-        $response = $this->post(route('booking.store'), [
-            'slot_id' => $slot->id,
-            'email' => 'guest@example.com',
-        ]);
+        $response = $this->withHeader('Referer', route('booking.create'))
+            ->post(route('booking.store'), [
+                'slot_id' => $slot->id,
+                'email' => 'guest@example.com',
+            ]);
 
         // Assert: redirected back to booking.create and DB contains booking
         $response->assertRedirect(route('booking.create'));
