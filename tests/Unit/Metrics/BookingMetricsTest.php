@@ -3,15 +3,24 @@
 namespace Tests\Unit\Metrics;
 
 use App\Support\Metrics\BookingMetrics;
-use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\Repository;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
 class BookingMetricsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Config::set('metrics.store', 'array');
+        Config::set('booking.statuses', ['pending', 'confirmed']);
+        Cache::store('array')->flush();
+    }
+
     public function test_records_booking_creation_and_snapshot(): void
     {
-        $store = new Repository(new ArrayStore());
+        $store = Cache::store('array');
         $metrics = new BookingMetrics($store);
 
         $metrics->recordBookingCreated('pending');
