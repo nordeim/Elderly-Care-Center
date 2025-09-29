@@ -14,11 +14,18 @@ use App\Http\Controllers\Site\StaffController as SiteStaffController;
 use App\Http\Controllers\Site\TestimonialsController;
 use App\Http\Controllers\Site\VirtualTourController;
 use App\Http\Controllers\Payments\CheckoutController;
+use App\Http\Controllers\Payments\StripeWebhookController;
 use App\Http\Controllers\Metrics\BookingMetricsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HealthController;
 
 Route::get('/healthz', [HealthController::class, 'check']);
+
+Route::post('/payments/stripe/webhook', StripeWebhookController::class)
+    ->name('payments.stripe.webhook')
+    ->withoutMiddleware([
+        App\Http\Middleware\VerifyCsrfToken::class,
+    ]);
 
 Route::middleware('web')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
