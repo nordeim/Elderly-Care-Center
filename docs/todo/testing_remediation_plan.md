@@ -42,17 +42,32 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [ ] Confirm dependencies (seed data uses various models). Ensure migrations cover columns.
   - [ ] Use factories if available for maintainability.
   - [ ] Confirm route names `admin.analytics` exist.
+- **routes/web.php / app/Http/Controllers/Admin/AnalyticsController.php**
+  - [ ] Register `Route::get('/analytics', AnalyticsController::class)->name('analytics')` within the admin group.
+  - [ ] Ensure controller invocation returns expected dataset (align with view `resources/views/admin/analytics.blade.php`).
+  - [ ] After route addition, verify admin authorization middleware matches test expectations.
+- **seedAnalyticsData() adjustments**
+  - [ ] Create distinct booking slots (or increment slot IDs) to avoid unique constraint collisions on `bookings`.
+  - [ ] Consider seeding via factories once available.
 - **tests/Feature/Bookings/CreateBookingTest.php**
   - [ ] Ensure booking store route accessible without auth (CSRF?). Possibly disable mail job.
+- **VerifyCsrfToken middleware handling**
+  - [ ] In test `setUp`, call `$this->withoutMiddleware(VerifyCsrfToken::class)` or include `_token` in payload.
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**
   - [ ] Validate `MediaItem` relationship definitions present; ensure database seeds/migrations align.
+- **media pivot schema alignment**
+  - [ ] Update attachment call to use `media_id` (matches migration) or adjust migration/test accordingly.
 - **tests/Feature/Notifications/ReminderTest.php**
   - [ ] Ensure jobs & notifications dependencies set (queues, metrics). Provide configuration and service container bindings (Notification fake). Requires Mockery for metrics? verify.
 - **tests/Feature/Payments/StripeFlowTest.php**
   - [ ] After adding Mockery, confirm `StripeService` dependencies (config, routes) satisfied.
   - [ ] Optionally wrap with `withoutExceptionHandling()` for debug.
+- **Payments routing & Stripe SDK**
+  - [ ] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
+  - [ ] Register webhook route(s) for `StripeWebhookController` if required.
+  - [ ] Add `stripe/stripe-php` dependency or replace `Stripe\Event` usage with stub/DTO.
 
 ### 6. Global Config Adjustments for Tests
 - **config/metrics.php**
@@ -67,8 +82,9 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 2. Create `.env.testing` with DB + queue/test config (if missing).
 3. Adjust `phpunit.xml` (or document manual change) to load `.env.testing`.
 4. Patch tests needing config context (Config::set for metrics statuses, etc.).
-5. Re-run `php artisan test` inside container.
-6. Iterate on remaining failures until suite passes.
+5. Implement routes/controller adjustments and test helpers per sections above.
+6. Re-run `php artisan test` inside container.
+7. Iterate on remaining failures until suite passes.
 
 ## Validation Checklist
 - [ ] `composer install` completes with new dev dependency.
