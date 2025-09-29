@@ -1,69 +1,105 @@
-# Gemini Context: Elderly Daycare Platform
+# AI Agent Context: Elderly Daycare Platform
 
-This document provides a comprehensive overview for the Gemini AI agent to effectively understand and assist with the development of this project.
+**Purpose:**
+This document is the source of truth for AI agents interacting with this codebase. It provides a concise, factual overview of the project's architecture, key files, and development conventions.
 
-## 1. Project Overview
+---
 
-This is a **Laravel 12** web application designed to serve as a platform for an elderly daycare center. Its primary purpose is to allow families and caregivers to discover services, view facility information, and book visits. The platform is built with a "trust-first" and "accessibility-first" approach.
+## Project Overview
 
--   **Backend:** Laravel 12 (PHP 8.4)
--   **Frontend:** TailwindCSS and Alpine.js, rendered via server-side Blade templates.
--   **Database:** MariaDB
--   **Infrastructure:** The entire development environment is containerized using Docker.
--   **Architecture:** The project currently follows a standard **Laravel MVC (Model-View-Controller)** pattern. Business logic is primarily encapsulated in `app/Actions` and `app/Services`.
-    -   **Note:** Planning documents specify a more advanced Domain-Driven Design (DDD) and the use of Livewire for interactivity, but this has **not** been implemented. For consistency, all new code should follow the existing MVC pattern.
+This project is a web application for an **Elderly Daycare Platform**. It allows for booking services, managing clients, and handling related administrative tasks.
 
-## 2. Building and Running
+The architecture is a standard **Laravel Model-View-Controller (MVC)** pattern with a comprehensive service and action layer. Business logic is encapsulated in single-purpose Action classes (`app/Actions`) or domain-specific Service classes (`app/Services`). The application is designed to run in a Docker containerized environment for development and production consistency.
 
-The project is managed entirely through Docker. All commands should be prefixed with `docker-compose exec app`.
+### Technical Stack
 
-### Initial Setup
+| Component | Technology | Version / Details | Confirmation File |
+| :--- | :--- | :--- | :--- |
+| Backend Framework | Laravel | `~11.0` | `composer.json` |
+| Language | PHP | `8.2` | `Dockerfile` |
+| Database | MariaDB | `~10.11` | `docker-compose.yml` |
+| Caching & Queues | Redis | `~7.4` | `docker-compose.yml`, `.env.example` |
+| Frontend Stack | Blade, TailwindCSS, Alpine.js | Vite build tool | `package.json`, `vite.config.js` |
+| Dev Environment | Docker | Docker Compose | `docker-compose.yml` |
+| CI/CD | GitHub Actions | PHPUnit Workflows | `.github/workflows/` |
 
-```bash
-# 1. Copy environment configuration
+---
+
+## Building and Running the Application
+
+The project uses a Docker-based development environment managed by Docker Compose and a `Makefile` for convenience. The `docker/entrypoint.sh` script automates setup tasks (e.g., migrations, cache building) on container startup.
+
+### 1. First-Time Setup
+
+```sh
+# 1. Copy the example environment file
 cp .env.example .env
 
-# 2. Start Docker containers in the background
-docker-compose up -d
+# 2. Generate the Laravel application key
+docker-compose run --rm app php artisan key:generate
 
-# 3. Install PHP and JS dependencies
-docker-compose exec app composer install
-docker-compose exec app npm install
-
-# 4. Generate an application key
-docker-compose exec app php artisan key:generate
-
-# 5. Run database migrations and seeders
-docker-compose exec app php artisan migrate --seed
-
-# 6. Build frontend assets
-docker-compose exec app npm run build
-
-# The application will be available at http://localhost
+# 3. Build and start all services in the background
+make up
 ```
 
-### Running Tests
+### 2. Standard Workflow
 
-```bash
-# Run the entire test suite
-docker-compose exec app php artisan test
+The `Makefile` provides shortcuts for most common operations.
 
-# Run a specific test file (e.g., the booking test)
-docker-compose exec app php artisan test --filter=CreateBookingTest
+```sh
+# Start all services (builds if necessary)
+make up
+
+# Stop and remove all containers and volumes
+make down
+
+# Open a shell inside the application container
+make bash
+
+# Run database migrations
+make migrate
+
+# Run tests
+make test
+
+# View all available commands
+make help
 ```
 
-### Frontend Development
+The application will be available at `http://localhost:8000` and the Mailhog UI at `http://localhost:8025`.
 
-```bash
-# Start the Vite development server with hot-reloading
-docker-compose exec app npm run dev
-```
+---
 
-## 3. Development Conventions
+## Development Conventions
 
--   **Business Logic:** Core, single-purpose business logic should be placed in the `app/Actions` directory. Broader service-layer logic can be placed in `app/Services`.
--   **Controllers:** Controllers in `app/Http/Controllers` should remain lean, primarily responsible for handling HTTP requests/responses and delegating to Action or Service classes.
--   **Data Layer:** The data layer is well-defined with Eloquent models in `app/Models` and migrations in `database/migrations`. This is a stable part of the application.
--   **Testing:** Feature tests are the primary method of verification and are located in `tests/Feature`. All new functionality should be accompanied by corresponding feature tests.
--   **Configuration:** Custom application settings are stored in `config/*.php` files, such as `config/booking.php` and `config/media.php`.
--   **Consistency:** Adhere strictly to the existing MVC pattern for any new features or bug fixes to maintain architectural consistency.
+### Architecture
+*   **Adhere to the existing MVC architecture.** Do not introduce other patterns like DDD or Livewire unless explicitly instructed.
+*   Place new business logic inside single-purpose **Action classes** (`app/Actions`) or **Service classes** (`app/Services`).
+*   Controllers (`app/Http/Controllers`) should be lean and primarily responsible for handling HTTP requests and delegating to Actions or Services.
+*   Use Form Requests (e.g., `app/Http/Requests/BookingRequest.php`) for validating incoming request data.
+
+### Core Logic: Booking Flow
+The most critical user journey is the booking flow. Understanding it is key to working with the codebase.
+1.  **Route:** A `POST` request to `/book` is defined in `routes/web.php`.
+2.  **Controller:** The request is handled by `app/Http/Controllers/Site/BookingController.php`.
+3.  **Validation:** Data is validated by `app/Http/Requests/BookingRequest.php`.
+4.  **Business Logic:** The controller dispatches the validated data to the critical file `app/Actions/Bookings/CreateBookingAction.php`.
+5.  **Database:** The Action uses Eloquent models like `Booking` and `BookingSlot` to persist data.
+
+### Testing
+*   Tests are located in the `tests/` directory, primarily `tests/Feature/`.
+*   The main test for the booking creation process is `tests/Feature/Bookings/CreateBookingTest.php`.
+*   Run the entire test suite using `make test` or `docker-compose exec app php artisan test`.
+
+### Key Directories
+| Path | Description |
+| :--- | :--- |
+| `app/Actions/` | Core, single-responsibility business logic classes. |
+| `app/Services/` | Domain-specific business logic services (e.g., Payments, Media). |
+| `app/Http/Controllers/` | Controllers organized by area (Admin, Site, Payments). |
+| `app/Models/` | All Eloquent models. |
+| `app/Jobs/` | Queued jobs for asynchronous tasks (e.g., Notifications, Media). |
+| `app/Support/Metrics/` | Classes for collecting and analyzing application metrics. |
+| `config/` | Contains standard Laravel config and custom configs like `booking.php` and `media.php`. |
+| `database/migrations/` | The source of truth for the database schema. |
+| `routes/web.php` | Defines all web-facing application routes. |

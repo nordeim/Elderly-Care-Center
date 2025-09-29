@@ -5,7 +5,7 @@
 ![Laravel](https://img.shields.io/badge/Laravel-11.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![MariaDB](https://img.shields.io/badge/MariaDB-11.8-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 **A trust-first, accessibility-focused web platform for elderly daycare services**
@@ -53,6 +53,8 @@
 
 ### 🏃‍♂️ 5-Minute Setup
 
+This project uses a `Makefile` and a smart container `entrypoint` script to automate setup.
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-org/elderly-daycare-platform.git
@@ -61,24 +63,65 @@ cd elderly-daycare-platform
 # 2. Copy environment configuration
 cp .env.example .env
 
-# 3. Build and start Docker containers (installs PHP & Node dependencies)
-docker-compose up -d --build
+# 3. Build and start all services with one command
+# The container will automatically run key:generate, migrate, and seed on first start.
+make up
 
-# 4. Run database migrations & seeders
-docker-compose exec app php artisan migrate --seed
-
-# 5. Generate application key (first run only)
-docker-compose exec app php artisan key:generate
-
-# 🎉 Visit http://localhost
+# 🎉 Visit http://localhost:8000
 ```
+
+For more commands (testing, clearing cache, etc.), run `make help`.
 
 ### 🔑 Default Credentials
 
 ```
-Admin Panel: http://localhost/admin
+Admin Panel: http://localhost:8000/admin
 Email: admin@elderly-daycare.com
 Password: ChangeMeNow!
+```
+
+---
+
+## 📊 Current Codebase Status
+
+This project is in a **mid-development stage**. The foundational infrastructure is complete, and core features are functional.
+
+-   **Public-Facing Site:** The main content pages (Home, Services, Staff) are implemented.
+-   **Core Booking System:** The entire booking workflow, from the user submitting a request to the data being saved via the `CreateBookingAction`, is **implemented and functional**.
+-   **Admin Panel:** A basic admin panel exists for managing bookings, services, and staff.
+-   **Next Steps:** Future work will focus on expanding the admin dashboard, building out the payment integration, and refining the user notification system.
+
+---
+
+## 🌊 Application Logic Flow
+
+The most critical application workflow is the creation of a new booking. The following diagram illustrates the sequence of interactions between the system's components.
+
+```mermaid
+sequenceDiagram
+    participant User/Browser
+    participant Router (web.php)
+    participant BookingController
+    participant BookingRequest
+    participant CreateBookingAction
+    participant Database
+    participant BookingMetrics
+
+    User/Browser->>+Router: POST /book with form data
+    Router->>+BookingController: store(BookingRequest)
+    BookingController->>+BookingRequest: Validate data
+    Note right of BookingRequest: On failure, redirects back automatically
+    BookingRequest-->>-BookingController: Validation success
+    BookingController->>+CreateBookingAction: execute(validated_data)
+    CreateBookingAction->>+Database: Start Transaction
+    CreateBookingAction->>Database: Lock BookingSlot row
+    CreateBookingAction->>Database: Create Booking record
+    CreateBookingAction->>Database: Decrement slot availability
+    CreateBookingAction->>+BookingMetrics: recordBookingCreated()
+    BookingMetrics-->>-CreateBookingAction: Done
+    CreateBookingAction->>-Database: Commit Transaction
+    CreateBookingAction-->>-BookingController: Return Booking object
+    BookingController-->>-User/Browser: Redirect to success page
 ```
 
 ---
@@ -114,10 +157,10 @@ elderly-daycare-platform/
 │   ├── Unit/                 # Unit tests
 │   └── Browser/              # Browser tests
 │
-├── 📂 docker/                 # Docker configuration
-│   ├── apache/               # Web server config
-│   ├── php/                  # PHP configuration
-│   └── mysql/                # Database config
+├── 📂 docker/                 # Docker configuration & scripts
+│   ├── entrypoint.sh         # Container startup script
+│   ├── app-healthcheck.sh    # Healthcheck script
+│   └── nginx.conf            # Web server config
 │
 ├── 📂 public/                 # Public assets
 ├── 📂 storage/                # File storage
@@ -161,18 +204,17 @@ php artisan test --filter=Phase1
 
 ### 🧪 Testing
 
+The `Makefile` provides a convenient shortcut for running tests.
+
 ```bash
 # Run all tests
-docker-compose exec app php artisan test
-
-# Run specific test suite
-docker-compose exec app php artisan test --testsuite=Feature
+make test
 
 # Run with coverage
 docker-compose exec app php artisan test --coverage
 
-# Run browser tests
-docker-compose exec app php artisan dusk
+# Run a specific test suite
+docker-compose exec app php artisan test --testsuite=Feature
 ```
 
 ### 🎨 Frontend Development
@@ -333,26 +375,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - All contributors who have helped shape this project
 - Our elderly community members who inspired this platform
 
----
 
-## 📈 Project Status
-
-### Phase Completion
-
-- ✅ Phase 0: Foundation & Infrastructure
-- 🚧 Phase 1: Content Core & Basic Pages
-- ⏳ Phase 2: Trust Building & Social Proof
-- ⏳ Phase 3: Service Showcase
-- ⏳ Phase 4: Media Experience
-- ⏳ Phase 5: Engagement Tools
-- ⏳ Phase 6: Admin Dashboard
-- ⏳ Phase 7: Polish & Launch
-
-### Recent Updates
-
-- 🎉 **v0.1.0** - Initial release with core content management
-- 🔧 **v0.1.1** - Bug fixes and performance improvements
-- 🌟 **v0.2.0** - Added booking system (coming soon)
 
 ---
 

@@ -9,7 +9,7 @@ This document is the source of truth for AI agents interacting with this codebas
 
 | Attribute         | Value                                | Location / Confirmation                                        |
 |-------------------|--------------------------------------|---------------------------------------------------------------|
-| Backend Framework | Laravel 12                           | `composer.json`                                               |
+| Backend Framework | Laravel 11                           | `composer.json`                                               |
 | PHP Version       | 8.2                                  | `Dockerfile`                                                  |
 | Primary Database  | MariaDB                              | `docker-compose.yml`                                          |
 | Caching / Queues  | Redis                                | `config/queue.php`, `config/cache.php`                        |
@@ -139,7 +139,7 @@ docker-compose exec app php artisan test --filter=CreateBookingTest
 
 This is the most critical user journey. Understanding this flow is key to working with the codebase.
 
-- **Route Definition:** A `POST` request to `/booking` is defined in `routes/web.php`.
+- **Route Definition:** A `POST` request to `/book` is defined in `routes/web.php`.
 - **Controller Entrypoint:** The request is handled by the `store` method in `app/Http/Controllers/Site/BookingController.php`.
 - **Validation:** The incoming data is validated by `app/Http/Requests/BookingRequest.php`.
 - **Core Business Logic:** The controller dispatches the validated data to `app/Actions/Bookings/CreateBookingAction.php`. This Action class contains the logic for checking availability, creating the `Booking`, etc.
