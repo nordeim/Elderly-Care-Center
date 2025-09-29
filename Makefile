@@ -56,6 +56,15 @@ test: ## Run PHPUnit tests
 lint: ## Run Laravel Pint or PHP-CS-Fixer
     docker exec elderly-app ./vendor/bin/pint
 
+npm-dev: ## Start Vite development server (CTRL+C to stop)
+    docker compose exec -it elderly-app npm run dev
+
+npm-build: ## Build frontend assets for production
+    docker compose exec elderly-app npm run build
+
+npm-ci: ## Reinstall Node dependencies inside container
+    docker compose exec elderly-app npm ci
+
 env:check: ## Validate required .env variables
     grep -E '^APP_KEY=|^DB_HOST=|^DB_DATABASE=|^DB_USERNAME=|^DB_PASSWORD=' .env || echo "Missing required .env vars"
 
