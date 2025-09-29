@@ -45,6 +45,9 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 - **routes/web.php / app/Http/Controllers/Admin/AnalyticsController.php**
   - [x] Register `Route::get('/analytics', AnalyticsController::class)->name('analytics')` within the admin group.
   - [ ] Ensure controller invocation returns expected dataset (align with view `resources/views/admin/analytics.blade.php`).
+- **database/factories/CaregiverProfileFactory.php**
+  - [x] Create factory generating minimal user + client associations required by analytics test.
+  - [ ] Update analytics test seeding to use factory helpers consistently (or inline creation fallback).
 - **seedAnalyticsData() adjustments**
   - [x] Create distinct booking slots per booking (duplicate slot currently causes unique constraint violation).
   - [ ] Prefer using helper to generate slots dynamically rather than hard-coding IDs.
@@ -53,6 +56,8 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [x] Plan: override `setUp()` to disable CSRF via `$this->withoutMiddleware(VerifyCsrfToken::class)`.
 **VerifyCsrfToken middleware handling**
   - [x] Disable CSRF middleware for targeted test (use `$this->withoutMiddleware(VerifyCsrfToken::class)` in `setUp`).
+- **Session & referer prerequisites**
+  - [ ] Seed `_token` in session and include in POST payload or disable session middleware for booking flow test.
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**
@@ -65,6 +70,8 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
 - **tests/Feature/Payments/StripeFlowTest.php**
   - [ ] After adding Mockery, confirm `StripeService` dependencies (config, routes) satisfied.
   - [ ] Optionally wrap with `withoutExceptionHandling()` for debug.
+- **Stripe webhook controller adjustments**
+  - [ ] Ensure public handler methods exist or refactor test to call HTTP endpoint instead of protected method.
 - **Payments routing & Stripe SDK**
   - [x] Register caregiver checkout route pointing to `Payments\CheckoutController@show` (`payments.checkout.show`).
   - [x] Register webhook route(s) for `StripeWebhookController` (e.g., `Route::post('/payments/stripe/webhook', StripeWebhookController::class)`).
