@@ -1,6 +1,4 @@
 import Alpine from 'alpinejs'
-import '@phosphor-icons/web'
-
 import { initScrollAnimations } from './lib/animations'
 import { setupTestimonialsCarousel } from './lib/testimonials'
 
