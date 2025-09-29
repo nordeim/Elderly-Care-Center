@@ -29,7 +29,7 @@ Route::middleware('web')->group(function () {
         return redirect('/login');
     })->name('logout');
 
-    Route::get('/', HomeController::class)->name('home');
+    Route::get('/', [HomeController::class, 'index'])->name('landing');
     Route::get('/services', ServicesController::class)->name('services.index');
     Route::get('/staff', SiteStaffController::class)->name('staff.index');
     Route::get('/testimonials', TestimonialsController::class)->name('testimonials.index');
