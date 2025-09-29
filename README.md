@@ -2,8 +2,8 @@
 
 <div align="center">
 
-![Laravel](https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-11.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![MariaDB](https://img.shields.io/badge/MariaDB-11.8-003545?style=for-the-badge&logo=mariadb&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
@@ -49,6 +49,7 @@
 - Git
 - 8GB RAM (minimum)
 - 10GB free disk space
+- Node.js 18+ (only required if you plan to run the frontend tooling locally outside Docker)
 
 ### 🏃‍♂️ 5-Minute Setup
 
@@ -60,21 +61,14 @@ cd elderly-daycare-platform
 # 2. Copy environment configuration
 cp .env.example .env
 
-# 3. Start Docker containers
-docker-compose up -d
+# 3. Build and start Docker containers (installs PHP & Node dependencies)
+docker-compose up -d --build
 
-# 4. Install dependencies
-docker-compose exec app composer install
-docker-compose exec app npm install
-
-# 5. Setup database
+# 4. Run database migrations & seeders
 docker-compose exec app php artisan migrate --seed
 
-# 6. Generate application key
+# 5. Generate application key (first run only)
 docker-compose exec app php artisan key:generate
-
-# 7. Build frontend assets
-docker-compose exec app npm run build
 
 # 🎉 Visit http://localhost
 ```
@@ -95,16 +89,20 @@ Password: ChangeMeNow!
 elderly-daycare-platform/
 ├── 📂 app/                    # Application logic
 │   ├── Actions/               # Single-purpose actions
-│   ├── Http/                  # Controllers, middleware
-│   ├── Livewire/             # Livewire components
-│   ├── Models/               # Eloquent models
-│   ├── Repositories/         # Data access layer
-│   └── Services/             # Business logic
+│   ├── Console/               # Artisan commands
+│   ├── Http/                  # Controllers, middleware, requests
+│   ├── Jobs/                  # Queueable jobs
+│   ├── Models/                # Eloquent models
+│   ├── Notifications/         # Notification channels
+│   ├── Policies/              # Authorization policies
+│   ├── Providers/             # Service providers
+│   ├── Services/              # Domain services
+│   └── Support/               # Metrics and shared utilities
 │
 ├── 📂 resources/              # Frontend resources
-│   ├── views/                # Blade templates
-│   ├── css/                  # Stylesheets
-│   └── js/                   # JavaScript
+│   ├── views/                 # Blade templates
+│   ├── css/                   # Tailwind entry styles
+│   └── js/                    # Vite/Alpine/shadcn scripts
 │
 ├── 📂 database/               # Database files
 │   ├── migrations/           # Schema migrations
@@ -180,15 +178,18 @@ docker-compose exec app php artisan dusk
 ### 🎨 Frontend Development
 
 ```bash
-# Start development server with hot reload
-docker-compose exec app npm run dev
+# Start Vite development server with hot reload (exposed on http://localhost:5173)
+docker-compose exec -it app npm run dev
 
-# Build for production
+# Build for production (outputs to public/build)
 docker-compose exec app npm run build
 
-# Analyze bundle size
-docker-compose exec app npm run analyze
+# Reinstall Node dependencies (if package.json changes)
+docker-compose exec app npm ci
 ```
+
+- The Docker compose file maps port `5173` so the Vite dev server is reachable from your host machine.
+- If running tooling locally (outside Docker), set `VITE_HOST=0.0.0.0` in `.env` for hot module replacement.
 
 ---
 

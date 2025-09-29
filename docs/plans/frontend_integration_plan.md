@@ -54,6 +54,19 @@ Detailing required changes before modifying Laravel views, ignore rules, and con
   - Add phony targets executing `docker-compose exec app npm ...` for containerized workflow.
   - Ensure existing targets unaffected.
 
+## `README.md`
+- **Objectives**
+  - Align documented stack versions with actual codebase (Laravel 11, PHP 8.2).
+  - Update quick start to reflect Docker image now running Composer/NPM install during build.
+  - Document new frontend workflow with Vite dev server (port 5173) and commands.
+  - Highlight need for Node 18+ only for contributors running tooling locally (optional note).
+- **Planned Changes**
+  - Update badges/version strings to accurate values.
+  - Adjust setup steps: remove manual `composer install`/`npm install` since Docker build handles them, but keep commands for reruns if needed.
+  - Add sub-section under "Frontend Development" describing Vite server URL and mention `.env` `VITE_HOST`.
+  - Include note about `npm run dev` exposing HMR via port 5173 and corresponding `docker-compose` port mapping.
+  - Update project structure section removing non-existent directories (e.g., `Livewire/`).
+
 ## Validation Checklist
 - [ ] `npm run dev` works, hot reload accessible via http://localhost:5173 when container running.
 - [ ] `npm run build` outputs hashed assets into `public/build`.
