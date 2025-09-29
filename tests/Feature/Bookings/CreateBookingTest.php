@@ -7,9 +7,17 @@ use App\Models\Facility;
 use App\Models\Service;
 use App\Models\BookingSlot;
 use Illuminate\Support\Carbon;
+use App\Http\Middleware\VerifyCsrfToken;
 
 class CreateBookingTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+    }
+
     public function test_create_booking_happy_path(): void
     {
         // Arrange: create minimal facility, service and an upcoming booking slot

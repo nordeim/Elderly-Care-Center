@@ -49,10 +49,10 @@ Restore green `php artisan test` execution after transitioning to Laravel 11 / P
   - [x] Create distinct booking slots per booking (duplicate slot currently causes unique constraint violation).
   - [ ] Prefer using helper to generate slots dynamically rather than hard-coding IDs.
 - **tests/Feature/Bookings/CreateBookingTest.php**
-  - [ ] Ensure booking store route accessible without auth (CSRF?). Possibly disable mail job.
-  - [ ] Plan: override `setUp()` to disable CSRF via `$this->withoutMiddleware(VerifyCsrfToken::class)`.
+  - [x] Ensure booking store route accessible without auth (CSRF?). Possibly disable mail job.
+  - [x] Plan: override `setUp()` to disable CSRF via `$this->withoutMiddleware(VerifyCsrfToken::class)`.
 **VerifyCsrfToken middleware handling**
-  - [ ] Disable CSRF middleware for targeted test (use `$this->withoutMiddleware(VerifyCsrfToken::class)` in `setUp`).
+  - [x] Disable CSRF middleware for targeted test (use `$this->withoutMiddleware(VerifyCsrfToken::class)` in `setUp`).
 - **tests/Feature/ExampleTest.php**
   - [ ] Confirm root route returns 200 (requires seeding initial data?).
 - **tests/Feature/Media/VirtualTourTest.php**
