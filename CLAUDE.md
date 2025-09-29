@@ -4,11 +4,11 @@ Purpose: This document is the source of truth for AI agents interacting with thi
 1. Technical Vitals
 | Attribute | Value | Location / Confirmation |
 | --- | --- | --- |
-| Backend Framework | Laravel 12 | `composer.json` |
-| PHP Version | 8.4 | `README.md` |
+| Backend Framework | Laravel 11 | `composer.json` |
+| PHP Version | 8.2 | `composer.json` |
 | Primary Database | MariaDB | `docker-compose.yml` |
 | Caching / Queues | Redis | `config/queue.php`, `config/cache.php` |
-| Frontend Stack | TailwindCSS, Alpine.js (via Blade) | `package.json`, `PAD_condensed.md` |
+| Frontend Stack | Blade templates only | No package.json found |
 | Dev Environment | Docker | `docker-compose.yml` |
 | CI/CD | GitHub Actions | `.github/workflows/` |
 
@@ -21,9 +21,11 @@ There is a critical divergence between the planned architecture and the current 
 - **Frontend**: Highly interactive, server-side rendered via Livewire components.
 
 2.2. Current Implemented Architecture
-- **Pattern**: Standard Laravel Model-View-Controller (MVC).
-- **Directory Structure**: `app/Http/Controllers`, `app/Models`, `app/Services`. The `app/Domain` directory does not exist.
+- **Pattern**: Standard Laravel Model-View-Controller (MVC) with comprehensive service layer.
+- **Directory Structure**: `app/Http/Controllers`, `app/Models`, `app/Services`, `app/Jobs`, `app/Support/Metrics`, `app/Notifications`, `app/Policies`. The `app/Domain` directory does not exist.
 - **Frontend**: Traditional Blade templates. There are no Livewire components.
+- **Background Processing**: Comprehensive job system with Redis queues for notifications, media processing, and maintenance tasks.
+- **Metrics & Monitoring**: Built-in metrics collection system for bookings, media, and notifications.
 
 2.3. 🔴 Guidance for AI Agent 🔴
 - **Adhere to the CURRENT (MVC) architecture.**
@@ -90,13 +92,21 @@ docker-compose exec app php artisan test --filter=CreateBookingTest
 | Path | Description |
 | --- | --- |
 | `app/Http/Controllers/Site/` | Public-facing controllers for pages like Home, Services, and the Booking form. |
-| `app/Http/Controllers/Admin/` | Controllers for the admin panel (e.g., `BookingInboxController`). |
+| `app/Http/Controllers/Admin/` | Controllers for the admin panel (e.g., `BookingInboxController`, `ServiceController`, `StaffController`, `AnalyticsController`). |
+| `app/Http/Controllers/Payments/` | Payment integration controllers (`CheckoutController`, `StripeWebhookController`). |
+| `app/Http/Controllers/Metrics/` | Metrics and analytics controllers (`BookingMetricsController`). |
 | `app/Models/` | Contains all Eloquent models. This is the data layer and is well-aligned with the database schema. |
 | `app/Actions/` | Primary location for core business logic. Contains single-responsibility classes that execute key operations. |
 | `app/Actions/Bookings/CreateBookingAction.php` | CRITICAL FILE: Contains the primary logic for creating a new booking. |
-| `app/Jobs/` | Queued jobs for asynchronous tasks like sending notifications (`SendReminderJob`) and media processing (`TranscodeJob`). |
+| `app/Jobs/` | Queued jobs for asynchronous tasks. Contains `SendReminderJob`, `TranscodeJob`, `IngestMediaJob`, `ReservationSweeperJob`. |
+| `app/Jobs/Notifications/` | Notification-specific jobs (`SendReminderJob`). |
+| `app/Jobs/Media/` | Media processing jobs (`TranscodeJob`, `IngestMediaJob`). |
+| `app/Support/Metrics/` | Metrics collection and analysis (`BookingMetrics`, `MediaMetrics`, `NotificationMetrics`). |
+| `app/Notifications/` | Email and notification classes (`BookingReminderNotification`). |
+| `app/Policies/` | Authorization policies (`RolePolicy`). |
+| `app/Services/` | Business logic services organized by domain (Calendar, Media, Payments). |
 | `database/migrations/` | Contains all database schema definitions. This is the source of truth for the data structure. |
-| `config/booking.php`, `config/media.php` | Custom configuration files for application-specific settings. |
+| `config/booking.php`, `config/media.php`, `config/metrics.php` | Custom configuration files for application-specific settings. |
 | `tests/Feature/` | Primary location for tests. Contains feature tests that validate application workflows. |
 | `tests/Feature/Bookings/CreateBookingTest.php` | The main test file for the booking creation process. |
 
@@ -104,7 +114,7 @@ docker-compose exec app php artisan test --filter=CreateBookingTest
 This is the most critical user journey. Understanding this flow is key to working with the codebase.
 - **Route Definition**: A `POST` request to `/booking` is defined in `routes/web.php`.
 - **Controller Entrypoint**: The request is handled by the `store` method in `app/Http/Controllers/Site/BookingController.php`.
-- **Validation**: The incoming data is validated by `app/Http/Requests/CreateBookingRequest.php`.
+- **Validation**: The incoming data is validated by `app/Http/Requests/BookingRequest.php`.
 - **Core Business Logic**: The controller dispatches the validated data to `app/Actions/Bookings/CreateBookingAction.php`. This Action class contains the logic for checking availability, creating the `Booking` and `BookingSlot` records, and locking capacity.
 - **Database Interaction**: The Action uses Eloquent models like `Booking.php` and `BookingSlot.php` to persist data.
 - **Post-Booking Event**: An event is fired to trigger side-effects, such as sending a confirmation email (handled by a queued listener or job).
@@ -119,3 +129,45 @@ This is the most critical user journey. Understanding this flow is key to workin
 | `Booking` | `bookings` | Represents a confirmed booking made by a client for a specific slot. |
 | `MediaItem` | `media_items` | Stores metadata for uploaded photos and videos. |
 | `AuditLog` | `audit_logs` | Records significant actions performed by administrators. |
+| `Payment` | `payments` | Stores payment information and transaction records. |
+| `BookingNotification` | `booking_notifications` | Tracks notification delivery status and preferences. |
+| `CaregiverProfile` | `caregiver_profiles` | Stores caregiver-specific settings and preferences. |
+
+7. Background Processing & Job System
+The application includes a comprehensive job system for handling asynchronous tasks:
+
+| Job Class | Purpose | Queue |
+| --- | --- | --- |
+| `SendReminderJob` | Sends booking reminders via email/SMS | `notifications` |
+| `TranscodeJob` | Processes video files for web delivery | `media` |
+| `IngestMediaJob` | Handles media file ingestion and validation | `media` |
+| `ReservationSweeperJob` | Cleans up expired reservations | `default` |
+
+8. Metrics & Monitoring System
+Built-in metrics collection for operational monitoring:
+
+| Metrics Class | Purpose | Key Metrics |
+| --- | --- | --- |
+| `BookingMetrics` | Tracks booking-related metrics | Status transitions, creation counts, sweeper results |
+| `MediaMetrics` | Monitors media processing | Transcode success/failure rates, processing times |
+| `NotificationMetrics` | Tracks notification delivery | Sent, failed, skipped counts by channel |
+
+9. Payment Integration
+Stripe payment processing integration:
+
+| Component | Purpose |
+| --- | --- |
+| `CheckoutController` | Handles payment checkout flow |
+| `StripeWebhookController` | Processes Stripe webhook events |
+| `StripeService` | Core payment processing logic |
+| `Payment` model | Stores payment transaction records |
+
+10. Notification System
+Multi-channel notification delivery:
+
+| Component | Purpose |
+| --- | --- |
+| `BookingReminderNotification` | Sends booking reminders via email/SMS |
+| `SendReminderJob` | Queued job for reminder delivery |
+| Quiet hours support | Respects user timezone preferences |
+| Opt-in/opt-out handling | Manages user communication preferences |
