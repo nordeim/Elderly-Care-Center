@@ -51,9 +51,9 @@ COPY --chown=appuser:appgroup composer.json composer.lock package.json package-l
 
 # Set Composer environment and install vendors without scripts (cache preserved)
 ENV HOME=/home/appuser \
-    COMPOSER_HOME=/home/appuser/.composer
+    COMPOSER_HOME=/home/appuser/.composer \
+    NPM_CONFIG_CACHE=/home/appuser/.npm
 USER appuser
-RUN npm config set cache /home/appuser/.npm --global
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts \
     && npm ci
 
